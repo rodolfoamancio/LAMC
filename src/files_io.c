@@ -507,13 +507,16 @@ void RecordProfileData(FILE* ProfileFile, CONFIGURATION Configuration){
  *              - Configuration: Structure holding the configuration details
  *              - InitialConfigurationFile: Pointer to the output file
  ****************************************************************/
-void RecordInitialConfiguraiton(char BaseName[], CONFIGURATION Configuration, FILE* InitialConfigurationFile) {
+void RecordInitialConfiguraiton(char BaseName[], CONFIGURATION Configuration) {
+  FILE* InitialConfigurationFile;
   // Generates base name
   char ConfigurationsFileName[100];
   strcpy(ConfigurationsFileName, BaseName);
   RemoveSubstring(ConfigurationsFileName, ".inp");
   strcat(ConfigurationsFileName, "_initial_configuraion.out.xyz");
   
+  InitialConfigurationFile = fopen(ConfigurationsFileName, "w");
+
   fprintf(InitialConfigurationFile, "%d\n\n", Configuration.NumberMolecules * Configuration.Molecules[0].Size);
   
   char buffer[256];  // Buffer to store formatted output
