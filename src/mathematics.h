@@ -40,7 +40,6 @@ double LimMinMax(double val, double min, double max);
 double GetRandomNumber(void);
 double GetRandomDoubleInterval(double min, double max);
 double GetRandomGaussianNumber(void);
-double GetRandomStandardNormalNumber(void);
 int GetRandomIntegerInterval(int lower, int upper);
 
 bool Metropolis(double ProbabilityRatio);
