@@ -2,10 +2,10 @@
  * This code was written as a part of LAMC, a program to perform molecular Monte Carlo simulations of linear
  * alkanes on multiple ensembles.
  * 
- * This module structural.c is a code file for Monte Carlo functions
+ * This module files_io.c is a code file for defining files input output functions
  * 
  * Developer: Rodolfo J Amancio (rodolfojamancio@gmail.com)
- * University of Campinas, School of Chemical Engineering, Campinas/SP -  Brazil
+ * University of Campinas, School of Chemical Engineering, Campinas/SP -\sBrazil
  * 
  * **************************************************************************************************************/
 
@@ -15,13 +15,13 @@ enum ensemble SimulationEnsemble;
 enum ensemble EquilibraionEnsemble;
 enum ensemble Ensemble;
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | InitializeConfiguration
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Initializes the configuration with values for molecules
  * Parameters | Configuration: a pointer to the configuration struct
  * Returns    | None
- ****************************************************************/
+ * **************************************************************************************************************/
 void InitializeConfiguration(CONFIGURATION* Configuration) {
   Configuration->NumberMolecules = InitialNumberMolecules;
 
@@ -54,30 +54,28 @@ void InitializeConfiguration(CONFIGURATION* Configuration) {
   }
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | FreeConfiguration
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Frees the memory allocated for the configuration struct
  * Parameters | Configuration: a pointer to the configuration struct
  * Returns    | None
- ****************************************************************/
+ * **************************************************************************************************************/
 void FreeConfiguration(CONFIGURATION* Configuration){
   for(int i = 0; i < Configuration->NumberMolecules; i++)
   free(Configuration->Molecules[i].Atoms);
   free(Configuration->Molecules);
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | CopyConfiguration
- * -------------------------------------------------------------
- * Function   | Copies the content of the source configuration 
- *              struct to the destination configuration struct, 
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Copies the content of the source configuration struct to the destination configuration struct, 
  *              including allocated memory
- * Parameters | Source: the source configuration struct
- *            | Dest: a pointer to the destination configuration 
- *              struct
+ * Parameters | - Source: the source configuration struct
+ *            | - Dest: a pointer to the destination configuration struct
  * Returns    | None
- ****************************************************************/
+ * **************************************************************************************************************/
 void CopyConfiguration(CONFIGURATION Source, CONFIGURATION* Dest){
   for(int i=0; i<Dest->NumberMolecules; i++)
     free(Dest->Molecules[i].Atoms);
@@ -94,17 +92,14 @@ void CopyConfiguration(CONFIGURATION Source, CONFIGURATION* Dest){
     }
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | SampleBeadPosition
- * -------------------------------------------------------------
- * Function   | Calculate the position of a bead in a molecule 
- *              based on its index
- * Parameters | - Molecule: The molecule containing the atoms and 
- *              their positions
- *              - Bead: The index of the bead for which to 
- *              calculate the position
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Calculate the position of a bead in a molecule based on its index
+ * Parameters | - Molecule: The molecule containing the atoms and their positions
+ *            | - Bead: The index of the bead for which to calculate the position
  * Returns    | The vector representing the position of the specified bead
- ****************************************************************/
+ * **************************************************************************************************************/
 VECTOR SampleBeadPosition(MOLECULE Molecule, int Bead) {
     double BondLength;
     VECTOR DirectionalUnitVector;
@@ -138,9 +133,9 @@ VECTOR SampleBeadPosition(MOLECULE Molecule, int Bead) {
 }
 
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | SelectTrialOrientation
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Selects a trial orientation based on the 
  *              weights provided and the total weight
  * Parameters | - WeightList: An array of weights for each 
@@ -148,7 +143,7 @@ VECTOR SampleBeadPosition(MOLECULE Molecule, int Bead) {
  *              - TotalWeight: The sum of all the weights in 
  *              WeightList
  * Returns    | The index of the selected trial orientation
- ****************************************************************/
+ * **************************************************************************************************************/
 int SelectTrialOrientation(double *WeightList, double TotalWeight){
   int i=0;
   double SelectedAccumulatedWeight, AccumulatedSum;
@@ -161,13 +156,13 @@ int SelectTrialOrientation(double *WeightList, double TotalWeight){
   return i;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetRosenbluthWeightIdealChain
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Computes the Rsenbluth weight for an ideal chain
  * Parameters | Molecule (type MOLECULE) with molecular structure
  * Returns    | Roserbluth weight as double
- ****************************************************************/
+ * **************************************************************************************************************/
 double GetRosenbluthWeightIdealChain(MOLECULE Molecule){
   CONFIGURATION Configuration;
   POTENTIAL PartialPotential[MAX_CHAIN_SIZE][NUMBER_TRIAL_ORIENTATIONS];
@@ -222,14 +217,14 @@ double GetRosenbluthWeightIdealChain(MOLECULE Molecule){
   return WeightChain;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetRosenbluthWeightGhostMolecule
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Computers the Rosenbluth weight of a ghost 
  *              molecule in a given configuration
  * Parameters | Configuration (type CONFIGURATION)
  * Returns    | Rosenbluth weight as double
- ****************************************************************/
+ * **************************************************************************************************************/
 double GetRosenbluthWeightGhostMolecule(CONFIGURATION Configuration) {
     CONFIGURATION TestConfiguration;
     POTENTIAL Potential;
@@ -289,14 +284,14 @@ double GetRosenbluthWeightGhostMolecule(CONFIGURATION Configuration) {
     return WeightChain;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GenerateInitialConfiguration
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Generates an inition configuration
  * Parameters | Configuration (CONFIGURATION pointer) with 
  *              number of molecules and chain size already filled
  * Returns    | None
- ****************************************************************/
+ * **************************************************************************************************************/
 void GenerateInitialConfiguration(CONFIGURATION* Configuration) {
   CONFIGURATION AuxConfiguration;
   POTENTIAL PartialPotential[MAX_CHAIN_SIZE][NUMBER_TRIAL_ORIENTATIONS];
@@ -370,14 +365,14 @@ void GenerateInitialConfiguration(CONFIGURATION* Configuration) {
   free(AuxConfiguration.Molecules);
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetMoleculeDisplacement
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Generates displacement attempt
  * Parameters | - OldConfiguration (type CONFIGURATION)
  *              - NewConfiguration (type CONFIGURATION pointer)
  * Returns    | None
- ****************************************************************/
+ * **************************************************************************************************************/
 void GetMoleculeDisplacement(CONFIGURATION OldConfiguration, CONFIGURATION* NewConfiguration) {
   POTENTIAL PartialPotential;
   POTENTIAL NewPartialPotential[MAX_CHAIN_SIZE][NUMBER_TRIAL_ORIENTATIONS];
@@ -478,14 +473,14 @@ void GetMoleculeDisplacement(CONFIGURATION OldConfiguration, CONFIGURATION* NewC
     DisplacementStepsAccepted++;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetMoleculeInsertion
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Generates an insertion attempt
  * Parameters | - OldConfiguration (type CONFIGURATION)
  *              - NewConfiguration (type CONFIGURATION pointer)
  * Returns    | None
- ****************************************************************/
+ * **************************************************************************************************************/
 void GetMoleculeInsertion(CONFIGURATION OldConfiguration, CONFIGURATION *NewConfiguration) {
   POTENTIAL PartialPotential[MAX_CHAIN_SIZE * NUMBER_TRIAL_ORIENTATIONS];
   VECTOR DirectionalUnitVector;
@@ -573,14 +568,14 @@ void GetMoleculeInsertion(CONFIGURATION OldConfiguration, CONFIGURATION *NewConf
 }
 
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetMoleculeDeletion
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Computes a deleption attempt
  * Parameters | - OldConfiguration (type CONFIGURATION)
  *              - NewConfiguration (type CONFIGURATION pointer)
  * Returns    | None
- ****************************************************************/
+ * **************************************************************************************************************/
 void GetMoleculeDeletion(CONFIGURATION OldConfiguration, CONFIGURATION *NewConfiguration) {
   POTENTIAL PartialPotential;
   VECTOR DirectionalUnitVector;
@@ -662,14 +657,14 @@ void GetMoleculeDeletion(CONFIGURATION OldConfiguration, CONFIGURATION *NewConfi
   }
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetVolumeChange
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Generates a volume change attempt
  * Parameters | - OldConfiguration (type CONFIGURATION)
  *              - NewConfiguration (type CONFIGURATION pointer)
  * Returns    | None
- ****************************************************************/
+ * **************************************************************************************************************/
 void GetVolumeChange(CONFIGURATION OldConfiguration, CONFIGURATION* NewConfiguration) {
   BOX OldBox;
   BOX NewBox;
@@ -734,28 +729,28 @@ void GetVolumeChange(CONFIGURATION OldConfiguration, CONFIGURATION* NewConfigura
 }
 
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetNVTMovement
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Generates a NVT movement attempt
  * Parameters | - OldConfiguration (type CONFIGURATION)
  *              - NewConfiguration (type CONFIGURATION pointer)
  * Returns    | None
- ****************************************************************/
+ * **************************************************************************************************************/
 void GetNVTMovement(CONFIGURATION OldConfiguration, CONFIGURATION* NewConfiguration){
   DisplacementStepsAttempted++;
   CopyConfiguration(OldConfiguration, NewConfiguration);
   GetMoleculeDisplacement(OldConfiguration, NewConfiguration);
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetmuVTMovement
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Generates a muVT movement attempt
  * Parameters | - OldConfiguration (type CONFIGURATION)
  *              - NewConfiguration (type CONFIGURATION pointer)
  * Returns    | None
- ****************************************************************/
+ * **************************************************************************************************************/
 void GetmuVTMovement(CONFIGURATION OldConfiguration, CONFIGURATION* NewConfiguration){
   double RandomNumber = GetRandomNumber();
   double ProbabilitySum = DeletionAttemptProbability + InsertionAttemptProbability + DisplacementAttemptProbability;
@@ -768,14 +763,14 @@ void GetmuVTMovement(CONFIGURATION OldConfiguration, CONFIGURATION* NewConfigura
   }
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetNPTMovement
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Generates a NPT movement attempt
  * Parameters | - OldConfiguration (type CONFIGURATION)
  *              - NewConfiguration (type CONFIGURATION pointer)
  * Returns    | None
- ****************************************************************/
+ * **************************************************************************************************************/
 void GetNPTMovement(CONFIGURATION OldConfiguration, CONFIGURATION* NewConfiguration){
   if(GetRandomNumber() <= 1.0/((double) (OldConfiguration.NumberMolecules + 1))){
     GetVolumeChange(OldConfiguration, NewConfiguration);
@@ -784,15 +779,15 @@ void GetNPTMovement(CONFIGURATION OldConfiguration, CONFIGURATION* NewConfigurat
   }
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetMonteCarloMove
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Generates a Monte Carlo movement attempt with the
  *              appropriate simulation ensemble
  * Parameters | - OldConfiguration (type CONFIGURATION)
  *              - NewConfiguration (type CONFIGURATION pointer)
  * Returns    | None
- ****************************************************************/
+ * **************************************************************************************************************/
 void GetMonteCarloMove(CONFIGURATION OldConfiguration, CONFIGURATION* NewConfiguration){
   MovementAccepted = false;
   switch (Ensemble){
