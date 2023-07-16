@@ -195,7 +195,7 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
   PartialPotential.overlap = false;
   PartialPotential.potential = 0.0;
 
-  PartialPotential = GetPotentialExternaField(Configuration.Molecules[referenceMolecule].Atoms[referenceParticle]);
+  PartialPotential = GetPotentialExternalField(Configuration.Molecules[referenceMolecule].Atoms[referenceParticle]);
   
   if(PartialPotential.overlap) return PartialPotential;
 
@@ -419,7 +419,7 @@ double GetTotalPotentialExternal(CONFIGURATION Configuration){
   if(SimulationBox.ClosedBox){
     for(int i = 0; i < Configuration.NumberMolecules; i++){
       for(int j = 0; j < ChainSize; j++)
-      total += GetPotentialExternaField(Configuration.Molecules[i].Atoms[j]).potential;
+      total += GetPotentialExternalField(Configuration.Molecules[i].Atoms[j]).potential;
     }
   }  
   return total;

@@ -38,7 +38,7 @@ VECTOR SampleBendingAngle(VECTOR r1, VECTOR r2);
 VECTOR SampleBendingTorsionAngles(VECTOR r1, VECTOR r2, VECTOR r3);
 
 POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int referenceMolecule, int referenceParticle);
-POTENTIAL GetPotentialExternaField(ATOM Atom);
+POTENTIAL GetPotentialExternalField(ATOM Atom);
 VECTOR GetPotentialGradient(VECTOR SeparationVector, ATOM AtomA, ATOM AtomB);
 double GetPotentialSteele(ATOM Atom, double height);
 double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Potential);
