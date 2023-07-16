@@ -23,7 +23,7 @@
  *              The calculated long-range correction to the total 
  *              potential energy.
  ****************************************************************/
-double GetPressureLongRangeCorrection(CONFIGURATION Configuration, double* EpsilonAlkane, double* SigmaAlkane) {
+double GetPressureLongRangeCorrection(CONFIGURATION Configuration) {
   ATOM   AtomA, AtomB;
   int    NumberPesudoAtoms[3] = {0, 0, 0};
   double VolumeCubicMeters = SimulationBox.volume * Cube(ANGSTRON);
