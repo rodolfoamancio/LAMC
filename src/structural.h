@@ -28,8 +28,6 @@ typedef struct{
 
 VECTOR GetMoleculeCenterOfMass(MOLECULE Molecule);
 void GetCenterOfMassAllMolecules(CONFIGURATION *Configuration);
-double GetMoleculeOrderParameter(MOLECULE Molecule);
-void GetOrderParameterAllMolecules(CONFIGURATION *Configuration);
 void CalculateOrderParameter(CONFIGURATION *Configuraiton);
 void DetermineDensityProfile(CONFIGURATION Configuration, PROFILE *DensityProfile);
 void DetermineOrientationProfile(CONFIGURATION Configuration, PROFILE *OrientationProfile);

@@ -40,12 +40,6 @@ void CopyConfiguration(CONFIGURATION Source, CONFIGURATION* Dest);
 void FreeConfiguration(CONFIGURATION* Configuration);
 void InitializeConfiguration(CONFIGURATION* Configuration);
 
-
-// Cavity-biased functions
-void   PerformCavityScan(CONFIGURATION Configuration, VECTOR* TrialPositions, bool* IsCavity);
-bool   CheckCavity(CONFIGURATION Configuration, VECTOR Position);
-double GetProbabilityCavity(int NumberMolecules);
-
 // Initialaization function
 void GenerateInitialConfiguration(CONFIGURATION* Configuration);
 

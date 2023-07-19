@@ -29,7 +29,6 @@
 
 void RemoveSubstring (char *string, char *sub);
 
-void ReadInitialConfiguration(char InitialConfigurationFilePath[], CONFIGURATION* Configuration);
 void ReadInputFile(char inputsFilePath[]);
 
 FILE* InitializePropertiesDataFile(char BaseName[]);

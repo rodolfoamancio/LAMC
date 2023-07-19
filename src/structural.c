@@ -56,45 +56,6 @@ void GetCenterOfMassAllMolecules(CONFIGURATION *Configuration){
   }
 }
 
-/***************************************************************
- * Name       | GetMoleculeOrderParameter
- * -------------------------------------------------------------
- * Function   | Calculates the order parameter of a molecule based 
- *              on its size and orientation
- * Parameters | Molecule: a MOLECULE struct type variable
- * Returns    | double: the calculated order parameter value
- ****************************************************************/
-double GetMoleculeOrderParameter(MOLECULE Molecule){
-  VECTOR HeadTailVector, zVersor;
-  double Angle, OrderParameter;
-  zVersor.x=zVersor.y=0.0;
-  zVersor.z=1.0;
-  if(Molecule.Size>1){
-    HeadTailVector = VectorSubtraction(
-      Molecule.Atoms[0].Position,
-      Molecule.Atoms[Molecule.Size-1].Position
-    );
-    Angle = InternalAngle(HeadTailVector, zVersor);
-    OrderParameter = 0.5*(3.0*Squared(cos(Angle)) - 1.0);
-  }else{
-    OrderParameter = 0.0;
-  }
-  return OrderParameter;
-}
-
-/***************************************************************
- * Name       | GetOrderParameterAllMolecules
- * -------------------------------------------------------------
- * Function   | Calculates the order parameter for all molecules 
- *              in a given configuration
- * Parameters | Configuration: a pointer to a CONFIGURATION struct
- * Returns    | None
- ****************************************************************/
-void GetOrderParameterAllMolecules(CONFIGURATION *Configuration){
-  for(int i=0; i<Configuration->NumberMolecules; i++){
-    Configuration->Molecules[i].OrderParameter = GetMoleculeOrderParameter(Configuration->Molecules[i]);
-  }
-}
 
 /***************************************************************
  * Name       | CalculateOrderParameter
@@ -110,7 +71,10 @@ void CalculateOrderParameter(CONFIGURATION *Configuraiton){
   zVersor.x = zVersor.y = 0;
   zVersor.z = 1;
   for(int i = 0; i < Configuraiton->NumberMolecules; i++){
-    HeadTailVector = VectorSubtraction(Configuraiton->Molecules[i].Atoms[Configuraiton->Molecules[i].Size - 1].Position, Configuraiton->Molecules[i].Atoms[0].Position);
+    HeadTailVector = VectorSubtraction(
+      Configuraiton->Molecules[i].Atoms[Configuraiton->Molecules[i].Size - 1].Position, 
+      Configuraiton->Molecules[i].Atoms[0].Position
+    );
     OrientationAngle = InternalAngle(HeadTailVector, zVersor);
     Configuraiton->Molecules[i].OrderParameter = 0.5*(3.*Squared(cos(OrientationAngle)) - 1);
   }
@@ -175,7 +139,10 @@ void DetermineDensityProfile(CONFIGURATION Configuration, PROFILE *DensityProfil
   for(int i = 0; i < (DensityProfile->numberOfBins); i++){
     int CountMoleculesInssideBin = 0;
     for(int j = 0; j < Configuration.NumberMolecules; j++){
-      if(Configuration.Molecules[j].CenterOfMass.z > DensityProfile->binsDelimiters[i] && Configuration.Molecules[j].CenterOfMass.z <= DensityProfile->binsDelimiters[i+1]){
+      if(
+        Configuration.Molecules[j].CenterOfMass.z > DensityProfile->binsDelimiters[i] 
+        && Configuration.Molecules[j].CenterOfMass.z <= DensityProfile->binsDelimiters[i+1]
+        ){
         CountMoleculesInssideBin++;
       }
     }
@@ -200,7 +167,10 @@ void DetermineOrientationProfile(CONFIGURATION Configuration, PROFILE *Orientati
       int countMoleculesInsideBin = 0;
       double OrderParameterSum = 0;
       for(int j = 0; j < Configuration.NumberMolecules; j++){
-        if(Configuration.Molecules[j].CenterOfMass.z > OrientationProfile->binsDelimiters[i] && Configuration.Molecules[j].CenterOfMass.z <= OrientationProfile->binsDelimiters[i+1]){
+        if(
+          Configuration.Molecules[j].CenterOfMass.z > OrientationProfile->binsDelimiters[i] 
+          && Configuration.Molecules[j].CenterOfMass.z <= OrientationProfile->binsDelimiters[i+1]
+          ){
           countMoleculesInsideBin++;
           OrderParameterSum += Configuration.Molecules[j].OrderParameter;
         }

@@ -63,44 +63,6 @@ void RemoveSubstring (char *string, char *sub) {
 }
 
 /* ***************************************************************************************************************
- * Name       | ReadInitialConfiguration                                                            
- * --------------------------------------------------------------------------------------------------------------- 
- * Function   | Reads the initial configuration from a file and stores it in a CONFIGURATION structure.      
- * Parameters | InitialConfigurationFilePath: The path of the file containing the initial configuration.               
- *            | Configuration: A pointer to a CONFIGURATION structure where the data will be stored.    
- * **************************************************************************************************************/   
-void ReadInitialConfiguration(char InitialConfigurationFilePath[], CONFIGURATION* Configuration){
-  FILE* InitialConfiguraitonFile = fopen(InitialConfigurationFilePath, "r");
-  CONFIGURATION InitialConfiguraiton;
-  VECTOR AtomPosition;
-  char  str[100], aux1[100], aux2[100], aux3[100];
-  double x, y, z;
-  int  NumberOfParticles, CCounter = 0, MoleculeIndex, ParticleIndex;
-
-  fscanf(InitialConfiguraitonFile, "%d", &NumberOfParticles);
-  fscanf(InitialConfiguraitonFile, "%s %s %s", aux1, aux2, aux3);
-  for(int i = 0; i < NumberOfParticles; i++){
-   fscanf(InitialConfiguraitonFile, "%s %lf %lf %lf", aux1, &AtomPosition.x, &AtomPosition.y, &AtomPosition.z);
-   if(strcmp(aux1, "C")==0){
-    MoleculeIndex = CCounter/ChainSize;
-    ParticleIndex = CCounter % ChainSize;
-    Configuration->Molecules[MoleculeIndex].Atoms[ParticleIndex].Position = AtomPosition;
-    CCounter++;
-   }
-  }
-
-  if(CCounter == InitialNumberMolecules*ChainSize){
-   printf("Initial configuration file loaded successfully. Don't panic!\n");
-   InitialConfiguraiton.NumberMolecules = InitialNumberMolecules;
- }else{
-  printf("Something is wrong in the initial configuration file!\n");
-  printf("Number of carbon atoms read %d, expected %d\n", CCounter, InitialNumberMolecules*ChainSize);
- }
- fclose(InitialConfiguraitonFile);
-}
-
-
-/* ***************************************************************************************************************
  * Name       | ReadInputFile                                                            
  * --------------------------------------------------------------------------------------------------------------- 
  * Function   | Reads the input file and sets the corresponding variables.      
@@ -570,15 +532,13 @@ void RecordConfiguration(FILE* IntermediateConfigurationFile, CONFIGURATION Conf
 
   for (int i = 0; i < Configuration.NumberMolecules; i++) {
     for (int j = 0; j < Configuration.Molecules[i].Size; j++) {
-      char atomString[50];
-      sprintf(
-        atomString, 
+      fprintf(
+        IntermediateConfigurationFile, 
         "C  %.4f  %.4f  %.4f\n", 
         Configuration.Molecules[i].Atoms[j].Position.x, 
         Configuration.Molecules[i].Atoms[j].Position.y, 
         Configuration.Molecules[i].Atoms[j].Position.z
       );
-      fprintf(IntermediateConfigurationFile, "%s", atomString);
     }
   }
 }

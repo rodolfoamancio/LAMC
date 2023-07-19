@@ -23,24 +23,23 @@
  *              The calculated long-range correction to the total 
  *              potential energy.
  ****************************************************************/
-double GetPressureLongRangeCorrection(CONFIGURATION Configuration) {
+double GetPressureLongRangeCorrection(CONFIGURATION Configuration){
   ATOM   AtomA, AtomB;
   int    NumberPesudoAtoms[3] = {0, 0, 0};
-  double VolumeCubicMeters = SimulationBox.volume * Cube(ANGSTRON);
+  double VolumeCubicMeters = SimulationBox.volume*Cube(ANGSTRON);
   double AuxInteractions = 0;
 
-  // Count the number of pseudo atoms of each type
-  for (int i = 0; i < Configuration.NumberMolecules; i++) {
-    for (int j = 0; j < Configuration.Molecules[i].Size; j++) {
-      switch (Configuration.Molecules[i].Atoms[j].Type) {
+  for(int i = 0; i < Configuration.NumberMolecules; i++){
+    for(int j = 0; j < Configuration.Molecules[i].Size; j++){
+      switch (Configuration.Molecules[i].Atoms[j].Type){
         case CH4:
           NumberPesudoAtoms[0]++;
           break;
-
+        
         case CH3:
           NumberPesudoAtoms[1]++;
           break;
-
+        
         case CH2:
           NumberPesudoAtoms[2]++;
           break;
@@ -48,26 +47,27 @@ double GetPressureLongRangeCorrection(CONFIGURATION Configuration) {
     }
   }
 
-  for (int i = 0; i < NUMBER_PSEUDO_ATOMS_TYPES; i++) {
-    AtomA.Epsilon = EpsilonAlkane[i];
-    AtomA.Sigma = SigmaAlkane[i];
-    double EpsilonI = AtomA.Epsilon * Cube(ANGSTRON);
-    double SigmaI = AtomA.Sigma / CUTOFF_DISTANCE;
-    double SigmaOverCutoffI3 = Cube(SigmaI) / Cube(CUTOFF_DISTANCE);
+  AuxInteractions = 0;
 
-    for (int j = 0; j < NUMBER_PSEUDO_ATOMS_TYPES; j++) {
-      AtomB.Epsilon = EpsilonAlkane[j];
-      AtomB.Sigma = SigmaAlkane[j];
-      double EpsilonJ = AtomB.Epsilon * Cube(ANGSTRON);
-      double SigmaJ = AtomB.Sigma / CUTOFF_DISTANCE;
-      double SigmaOverCutoffJ3 = Cube(SigmaJ) / Cube(CUTOFF_DISTANCE);
+  for(int i = 0; i < NUMBER_PSEUDO_ATOMS_TYPES; i++){
+    AtomA.Epsilon  = EpsilonAlkane[i];
+    AtomA.Sigma    = SigmaAlkane[i];
+    for(int j = 0; j < NUMBER_PSEUDO_ATOMS_TYPES; j++){
+      AtomB.Epsilon  = EpsilonAlkane[j];
+      AtomB.Sigma    = SigmaAlkane[j];
+      double Epsilon = GetEpsilon(AtomA.Epsilon, AtomB.Epsilon);
+      double Sigma   = GetSigma(AtomA.Sigma, AtomB.Sigma);
 
-      AuxInteractions += (NumberPesudoAtoms[i] * NumberPesudoAtoms[j] * GetEpsilon(EpsilonI, EpsilonJ) *
-          Cube(AtomA.Sigma * ANGSTRON) * ((2.0/3.0) * SigmaOverCutoffJ3 - SigmaOverCutoffI3));
+      double SigmaOverCutoff = Sigma/CUTOFF_DISTANCE;
+      double SigmaOverCutoff3 = Cube(SigmaOverCutoff);
+      double SigmaOverCutoff9 = Cube(SigmaOverCutoff3);
+
+      AuxInteractions += (NumberPesudoAtoms[i]*NumberPesudoAtoms[j]*Epsilon*Cube(Sigma*ANGSTRON)*\
+        ((2./3.)*SigmaOverCutoff9-SigmaOverCutoff3));
     }
   }
 
-  return 16.0 * M_PI * AuxInteractions / (3.0 * Squared(VolumeCubicMeters));
+  return 16.*M_PI*AuxInteractions/(3.*Squared(VolumeCubicMeters));
 }
 
 /***************************************************************
@@ -95,63 +95,48 @@ double GetPressureIdealGas(int numberOfMolecules, double volume){
  *              system's configuration
  * Returns    | The excess pressure
  ****************************************************************/
-double GetPressureExcess(CONFIGURATION Configuration) {
+double GetPressureExcess(CONFIGURATION Configuration){
   VECTOR Position, CenterOfMass, Force;
-  double Average = 0.0;
-  double VolumeMeters = SimulationBox.volume * Cube(ANGSTRON);
+  double Average;
+  double VolumeMeters = SimulationBox.volume*Cube(ANGSTRON);
   double PressureExcess = 0.0;
 
-  if (ReferencePotential == LENNARD_JONES) {
-    StrainDerivativeTensor.xx = 0.0;
-    StrainDerivativeTensor.yx = 0.0;
-    StrainDerivativeTensor.zx = 0.0;
-
-    StrainDerivativeTensor.xy = 0.0;
-    StrainDerivativeTensor.yy = 0.0;
-    StrainDerivativeTensor.zy = 0.0;
-
-    StrainDerivativeTensor.xz = 0.0;
-    StrainDerivativeTensor.yz = 0.0;
-    StrainDerivativeTensor.zz = 0.0;
+  if(ReferencePotential == LENNARD_JONES){
+    StrainDerivativeTensor.xx=StrainDerivativeTensor.xy=StrainDerivativeTensor.xz=0.0;
+    StrainDerivativeTensor.yx=StrainDerivativeTensor.yy=StrainDerivativeTensor.yz=0.0;
+    StrainDerivativeTensor.zx=StrainDerivativeTensor.zy=StrainDerivativeTensor.zz=0.0;
     
     ComputeNonbondedForces(&Configuration);
-
-    for (int i = 0; i < Configuration.NumberMolecules; i++) {
+    
+    for(int i=0; i<Configuration.NumberMolecules; i++){
       CenterOfMass = GetMoleculeCenterOfMass(Configuration.Molecules[i]);
-
-      for (int j = 0; j < Configuration.Molecules[i].Size; j++) {
+      for(int j=0; j<Configuration.Molecules[i].Size; j++){
         Position = Configuration.Molecules[i].Atoms[j].Position;
         Force = Configuration.Molecules[i].Atoms[j].Force;
+        StrainDerivativeTensor.xx += Force.x*(Position.x - CenterOfMass.x)*ANGSTRON;
+        StrainDerivativeTensor.yx += Force.x*(Position.y - CenterOfMass.y)*ANGSTRON;
+        StrainDerivativeTensor.zx += Force.x*(Position.z - CenterOfMass.z)*ANGSTRON;
 
-        double dx = (Position.x - CenterOfMass.x) * ANGSTRON;
-        double dy = (Position.y - CenterOfMass.y) * ANGSTRON;
-        double dz = (Position.z - CenterOfMass.z) * ANGSTRON;
+        StrainDerivativeTensor.xy += Force.y*(Position.x - CenterOfMass.x)*ANGSTRON;
+        StrainDerivativeTensor.yy += Force.y*(Position.y - CenterOfMass.y)*ANGSTRON;
+        StrainDerivativeTensor.zy += Force.y*(Position.z - CenterOfMass.z)*ANGSTRON;
 
-        StrainDerivativeTensor.xx += Force.x * dx;
-        StrainDerivativeTensor.yx += Force.x * dy;
-        StrainDerivativeTensor.zx += Force.x * dz;
-
-        StrainDerivativeTensor.xy += Force.y * dx;
-        StrainDerivativeTensor.yy += Force.y * dy;
-        StrainDerivativeTensor.zy += Force.y * dz;
-
-        StrainDerivativeTensor.xz += Force.z * dx;
-        StrainDerivativeTensor.yz += Force.z * dy;
-        StrainDerivativeTensor.zz += Force.z * dz;
+        StrainDerivativeTensor.xz += Force.z*(Position.x - CenterOfMass.x)*ANGSTRON;
+        StrainDerivativeTensor.yz += Force.z*(Position.y - CenterOfMass.y)*ANGSTRON;
+        StrainDerivativeTensor.zz += Force.z*(Position.z - CenterOfMass.z)*ANGSTRON;
       }
     }
-
-    Average = 0.5 * (StrainDerivativeTensor.xy + StrainDerivativeTensor.yx);
+    Average = 0.5*(StrainDerivativeTensor.xy+StrainDerivativeTensor.yx);
     StrainDerivativeTensor.xy = StrainDerivativeTensor.yx = Average;
-
-    Average = 0.5 * (StrainDerivativeTensor.xz + StrainDerivativeTensor.zx);
+    Average = 0.5*(StrainDerivativeTensor.xz+StrainDerivativeTensor.zx);
     StrainDerivativeTensor.xz = StrainDerivativeTensor.zx = Average;
-
-    Average = 0.5 * (StrainDerivativeTensor.yz + StrainDerivativeTensor.zy);
+    Average = 0.5*(StrainDerivativeTensor.yz+StrainDerivativeTensor.zy);
     StrainDerivativeTensor.yz = StrainDerivativeTensor.zy = Average;
 
-    PressureExcess = -MatrixTrace(StrainDerivativeTensor) / (3.0 * VolumeMeters);
+    PressureExcess = -MatrixTrace(StrainDerivativeTensor)/(3.0*VolumeMeters);
+  }else{
+    PressureExcess = 0.0;
   }
-
+  
   return PressureExcess;
 }

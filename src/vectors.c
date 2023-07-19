@@ -21,7 +21,6 @@ BOX SimulationBox;
  * Parameters | r: The input vector (type: VECTOR)
  * Returns    | The norm of the input vector (type: double)
  ****************************************************************/
-
 double Norm(VECTOR r){
   return sqrt(Squared(r.x) + Squared(r.y) + Squared(r.z));
 }

@@ -80,7 +80,7 @@ double GetPotentialBonded(CONFIGURATION Configuration) {
     }
     
     // loop for molecular bending energy potential
-    for(int j=0; j<ChainSize - 2; ++j) {
+    for(int j=0; j<ChainSize-2; ++j) {
       ATOM atom1 = molecule.Atoms[j];
       ATOM atom2 = molecule.Atoms[j+1];
       ATOM atom3 = molecule.Atoms[j+2];
@@ -189,8 +189,10 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
   VECTOR SeparationVector;
   double sigma, epsilon;
   double DistanceSquared;
+  double potential;
   double SigmaOverDistance6;
   double SigmaOverDistance12;
+  bool ExcludedInterations;
 
   PartialPotential.overlap = false;
   PartialPotential.potential = 0.0;
@@ -199,28 +201,33 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
   
   if(PartialPotential.overlap) return PartialPotential;
 
-  ATOM referenceAtom = Configuration.Molecules[referenceMolecule].Atoms[referenceParticle];
   for(int i=0; i<Configuration.NumberMolecules; i++){
     for(int j=0; j<Configuration.Molecules[i].Size; j++){
-      bool excludedInteractions = (referenceMolecule==i) && (referenceParticle-j<4);
-      if((!excludedInteractions) && (!PartialPotential.overlap)){
-        ATOM targetAtom = Configuration.Molecules[i].Atoms[j];
-        SeparationVector = VectorSubtraction(referenceAtom.Position, targetAtom.Position);
+      ExcludedInterations = (referenceMolecule==i) && (referenceParticle-j<4);
+      if((!ExcludedInterations) && (!PartialPotential.overlap)){
+        SeparationVector = VectorSubtraction(
+          Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].Position, 
+          Configuration.Molecules[i].Atoms[j].Position
+        );
         SeparationVector = ApplyPeriodicBoundaryConditionsVector(SeparationVector);
         DistanceSquared  = NormSquared(SeparationVector);
-        
-        if(ReferencePotential == HARD_SPHERE && DistanceSquared < Squared(targetAtom.Sigma)){
+        sigma = GetSigma(
+          Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].Sigma, 
+          Configuration.Molecules[i].Atoms[j].Sigma
+        );
+
+        if(ReferencePotential == HARD_SPHERE && DistanceSquared < Squared(sigma)){
           PartialPotential.overlap = true;
           PartialPotential.potential = 1E30;
           return PartialPotential;
-        }
-        
-        if(ReferencePotential == LENNARD_JONES && DistanceSquared < CUTOFF_SQUARED){
-          sigma = GetSigma(referenceAtom.Sigma, targetAtom.Sigma);
-          epsilon = GetEpsilon(referenceAtom.Epsilon, targetAtom.Epsilon);
+        }else if(ReferencePotential == LENNARD_JONES && DistanceSquared < CUTOFF_SQUARED){
+          epsilon = GetEpsilon(
+              Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].Epsilon, 
+              Configuration.Molecules[i].Atoms[j].Epsilon
+          );
           SigmaOverDistance6  = pow(sigma, 6)/Cube(DistanceSquared);
           SigmaOverDistance12 = Squared(SigmaOverDistance6);
-          double potential = 4.0*epsilon*(SigmaOverDistance12 - SigmaOverDistance6);
+          potential = 4.0*epsilon*(SigmaOverDistance12 - SigmaOverDistance6);
           if(Beta*potential > 10){
             PartialPotential.overlap = true;
             PartialPotential.potential = 1E30;
@@ -336,16 +343,16 @@ double GetPotentialSteele(ATOM Atom, double height) {
 
   binaryInteractionParameter = -0.035;
 
-  sigma  = GetSigma(Atom.Sigma, sigmaCarbon) * ANGSTRON;
-  epsilon = (1 - binaryInteractionParameter) * GetEpsilon(Atom.Epsilon, epsilonCarbon);
+  sigma = GetSigma(Atom.Sigma, sigmaCarbon)*ANGSTRON;
+  epsilon = (1-binaryInteractionParameter)*GetEpsilon(Atom.Epsilon, epsilonCarbon);
 
-  height = height * ANGSTRON;
+  height = height*ANGSTRON;
 
-  double term1 = 0.4 * pow(sigma / height, 10);
-  double term2 = pow(sigma / height, 4);
-  double term3 = pow(sigma, 4) / (3 * interlayerSpacing * pow(0.61 * interlayerSpacing + height, 3));
+  double term1 = 0.4*pow(sigma/height, 10);
+  double term2 = pow(sigma/height, 4);
+  double term3 = pow(sigma, 4)/(3*interlayerSpacing*pow(0.61*interlayerSpacing + height, 3));
 
-  double SteelePotential = 2 * M_PI * carbonDensity * epsilon * pow(sigma, 2) * interlayerSpacing * (term1 - term2 - term3);
+  double SteelePotential = 2*M_PI*carbonDensity*epsilon*pow(sigma, 2)*interlayerSpacing*(term1 - term2 - term3);
 
   return SteelePotential;
 }
@@ -471,8 +478,11 @@ double GetPotentialLongRangeCorrection(CONFIGURATION Configuration) {
         double SigmaOverCutoff = Sigma / CUTOFF_DISTANCE;
         double SigmaOverCutoffPower3 = Cube(SigmaOverCutoff);
         double SigmaOverCutoffPower9 = Cube(SigmaOverCutoffPower3);
-        AuxInteractions += (4.0/3.0) * NumberPesudoAtoms[i] * NumberPesudoAtoms[j] *
-                          (Epsilon * Cube(Sigma/METER_TO_ANGSTRON) * ((1./3.) * SigmaOverCutoffPower9 - SigmaOverCutoffPower3));
+        AuxInteractions += (
+          (4.0/3.0)
+          *NumberPesudoAtoms[i]*NumberPesudoAtoms[j]
+          *(Epsilon * Cube(Sigma/METER_TO_ANGSTRON)
+          *((1./3.)*SigmaOverCutoffPower9 - SigmaOverCutoffPower3)));
       }
     }
 
