@@ -62,7 +62,7 @@ void RunSimulation(char* InputFileName){
 	SimulationBox.volume = SimulationBox.xSize*SimulationBox.ySize*SimulationBox.zSize;
 	Ensemble = EquilibraionEnsemble;
 
-	OptimizeAcceptanceEveryCycles = 2;
+	OptimizeAcceptanceEveryCycles = 1;
 	OptimizeAcceptanceEverySteps = OptimizeAcceptanceEveryCycles*InitialNumberMolecules;
 
 	NumberTotalSteps = NumberTotalCycles*InitialNumberMolecules;
