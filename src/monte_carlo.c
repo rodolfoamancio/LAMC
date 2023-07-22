@@ -331,6 +331,7 @@ void GenerateInitialConfiguration(CONFIGURATION* Configuration){
     AuxConfiguration.Molecules[i].Atoms[0].Position = BasePosition;
 
     for(int j=1; j<AuxConfiguration.Molecules[i].Size; j++){
+      WeightBeadTotal[j]=0;
       for(int k=0; k<NUMBER_TRIAL_ORIENTATIONS; k++){
         PositionTrialOrientations[j][k] = SampleBeadPosition(AuxConfiguration.Molecules[i], j);
         AuxConfiguration.Molecules[i].Atoms[j].Position = PositionTrialOrientations[j][k];
@@ -339,7 +340,7 @@ void GenerateInitialConfiguration(CONFIGURATION* Configuration){
         WeightBeadTotal[j] += WeightBeadTrials[j][k];
       }
       SelectedTrialOrientation = SelectTrialOrientation(WeightBeadTrials[j], WeightBeadTotal[j]);
-      AuxConfiguration.Molecules[i].Atoms[j].Position = PositionTrialOrientations[j][SelectedTrialOrientation];
+      AuxConfiguration.Molecules[i].Atoms[j].Position = PositionTrialOrientations[j][SelectedTrialOrientation];    
     }
 
     BasePosition.x += CellLength;
