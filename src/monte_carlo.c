@@ -54,19 +54,6 @@ void InitializeConfiguration(CONFIGURATION* Configuration){
 }
 
 /* ***************************************************************************************************************
- * Name       | FreeConfiguration
- * ---------------------------------------------------------------------------------------------------------------
- * Function   | Frees the memory allocated for the configuration struct
- * Parameters | Configuration: a pointer to the configuration struct
- * Returns    | None
- * **************************************************************************************************************/
-void FreeConfiguration(CONFIGURATION* Configuration){
-  for(int i = 0; i < Configuration->NumberMolecules; i++)
-  free(Configuration->Molecules[i].Atoms);
-  free(Configuration->Molecules);
-}
-
-/* ***************************************************************************************************************
  * Name       | CopyConfiguration
  * ---------------------------------------------------------------------------------------------------------------
  * Function   | Copies the content of the source configuration struct to the destination configuration struct, 

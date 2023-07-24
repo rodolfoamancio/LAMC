@@ -37,7 +37,6 @@ extern enum ensemble Ensemble;
 
 // Memory handling functions
 void CopyConfiguration(CONFIGURATION Source, CONFIGURATION* Dest);
-void FreeConfiguration(CONFIGURATION* Configuration);
 void InitializeConfiguration(CONFIGURATION* Configuration);
 
 // Initialaization function
