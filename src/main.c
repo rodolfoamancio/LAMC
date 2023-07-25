@@ -41,7 +41,6 @@ void RunSimulation(char* InputFileName){
 	int OptimizeAcceptanceEverySteps, OptimizeAcceptanceEveryCycles;
 	int StepsShiftedTemperature;
 	CONFIGURATION OldConfiguration, NewConfiguration;
-	PROFILE DensityProfile, OrientationProfile;
 
 	StartTime = time(&StartTime);
 	CountProductionStates=0;
@@ -166,14 +165,7 @@ void RunSimulation(char* InputFileName){
 
 		PressureIdealGas = 0;
 		PressureExcess = 0;
-		PressureLongRangeCorrection = 0;		
-
-		if(ChainSize>1){
-			DensityProfile = ConfigureProfile(NumberBinsForProfiles);
-			OrientationProfile = ConfigureProfile(NumberBinsForProfiles);
-			DetermineDensityProfile(OldConfiguration, &DensityProfile);
-			DetermineOrientationProfile(OldConfiguration, &OrientationProfile);
-		}
+		PressureLongRangeCorrection = 0;
 	}
 
 	DensityMass = GetDensityMass(OldConfiguration);
