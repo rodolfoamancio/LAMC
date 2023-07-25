@@ -29,9 +29,5 @@ typedef struct{
 VECTOR GetMoleculeCenterOfMass(MOLECULE Molecule);
 void GetCenterOfMassAllMolecules(CONFIGURATION *Configuration);
 void CalculateOrderParameter(CONFIGURATION *Configuraiton);
-void DetermineDensityProfile(CONFIGURATION Configuration, PROFILE *DensityProfile);
-void DetermineOrientationProfile(CONFIGURATION Configuration, PROFILE *OrientationProfile);
-PROFILE ConfigureProfile(int numberOfBins);
-PROFILE SumProfiles(PROFILE Profile1, PROFILE Profile2);
 
 #endif
