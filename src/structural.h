@@ -18,14 +18,6 @@
 #include"molecule.h"
 #include"simulation_setup.h"
 
-typedef struct{
-  int numberOfBins;
-  double binHeight;
-  double binsDelimiters[MAX_PROFILE_SIZE];
-  double positions[MAX_PROFILE_SIZE];
-  double values[MAX_PROFILE_SIZE];
-} PROFILE;
-
 VECTOR GetMoleculeCenterOfMass(MOLECULE Molecule);
 void GetCenterOfMassAllMolecules(CONFIGURATION *Configuration);
 void CalculateOrderParameter(CONFIGURATION *Configuraiton);
