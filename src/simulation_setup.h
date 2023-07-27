@@ -46,23 +46,6 @@ extern double  AverageNumberMolecules;
 extern double  AverageDensityMass;
 extern double  AverageDensityMolar;
 
-extern double  BlockPressure[MAX_NUMBER_BLOCKS];
-extern double  BlockPressureExcess[MAX_NUMBER_BLOCKS];
-extern double  BlockPressureIdealGas[MAX_NUMBER_BLOCKS];
-extern double  BlockPressureLongRangeCorrection[MAX_NUMBER_BLOCKS];
-
-extern double  BlockPotential[MAX_NUMBER_BLOCKS];
-extern double  BlockPotentialNonbonded[MAX_NUMBER_BLOCKS];
-extern double  BlockPotentialBonded[MAX_NUMBER_BLOCKS];
-extern double  BlockPotentialLongRangeCorrection[MAX_NUMBER_BLOCKS];
-extern double  BlockPotentialWalls[MAX_NUMBER_BLOCKS];
-
-extern double  BlockWeightGhostMolecule[MAX_NUMBER_BLOCKS];
-
-extern double  BlockNumberMolecules[MAX_NUMBER_BLOCKS];
-extern double  BlockDensityMass[MAX_NUMBER_BLOCKS];
-extern double  BlockDensityMolar[MAX_NUMBER_BLOCKS];
-
 extern double  MaxTranslationDistance;
 extern double  MaxLnVolumeChange;
 extern double  DisplacementAcceptanceCalculated;
