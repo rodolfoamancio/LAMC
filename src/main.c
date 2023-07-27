@@ -143,7 +143,7 @@ void RunSimulation(char* InputFileName){
 
 	// Initialize output files
 	PropertiesDataFile = InitializePropertiesDataFile(InputFileName);
-	ConfigurationsFile = InitializeTrajectoryFile(InputFileName);
+	ConfigurationsFile = InitializeConfigurationFile(InputFileName);
 	
 	if(SimulationBox.ClosedBox && ChainSize > 1)
 		ProfileFile = InitializeProfilesFile(InputFileName);

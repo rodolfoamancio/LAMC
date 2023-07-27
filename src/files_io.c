@@ -53,7 +53,7 @@ char* GetPotentialTypeLabel(enum PotentialType Potential){
  * Parameters | string: A pointer to the string from which the substring needs to be removed.                           
  *            | sub: A pointer to the substring that needs to be removed from the string.  
  * **************************************************************************************************************/
-void RemoveSubstring (char *string, char *sub) {
+void RemoveSubstring(char *string, char *sub) {
   char *match;
   int len = strlen(sub);
   while ((match = strstr(string, sub))) {
@@ -459,49 +459,15 @@ void RecordProfileData(FILE* ProfileFile, CONFIGURATION Configuration){
   fprintf(ProfileFile, "\n");
 }
 
-
 /***************************************************************
- * Name       | RecordInitialConfiguraiton
- * -------------------------------------------------------------
- * Function   | Records the initial configuration to a file.
- * Parameters |
- *              - BaseName: Name for the output file (based on the .inp input)
- *              - Configuration: Structure holding the configuration details
- *              - InitialConfigurationFile: Pointer to the output file
- ****************************************************************/
-void RecordInitialConfiguraiton(char BaseName[], CONFIGURATION Configuration) {
-  FILE* InitialConfigurationFile;
-  // Generates base name
-  char ConfigurationsFileName[100];
-  strcpy(ConfigurationsFileName, BaseName);
-  RemoveSubstring(ConfigurationsFileName, ".inp");
-  strcat(ConfigurationsFileName, "_initial_configuraion.out.xyz");
-  
-  InitialConfigurationFile = fopen(ConfigurationsFileName, "w");
-
-  fprintf(InitialConfigurationFile, "%d\n\n", Configuration.NumberMolecules * Configuration.Molecules[0].Size);
-  
-  char buffer[256];  // Buffer to store formatted output
-  
-  for (int i = 0; i < Configuration.NumberMolecules; i++) {
-    for (int j = 0; j < ChainSize; j++) {
-      sprintf(buffer, "C  %.4f  %.4f  %.4f\n", Configuration.Molecules[i].Atoms[j].Position.x,
-              Configuration.Molecules[i].Atoms[j].Position.y, Configuration.Molecules[i].Atoms[j].Position.z);
-      fputs(buffer, InitialConfigurationFile);
-    }
-  }
-}
-
-
-/***************************************************************
- * Name       | InitializeTrajectoryFile
+ * Name       | InitializeConfigurationFile
  * -------------------------------------------------------------
  * Function   | Initializes the trajectory file for writing.
  * Parameters |
  *              - BaseName: Name for the output file (based on the .inp input)
  * Returns    | Pointer to the trajectory file
  ****************************************************************/
-FILE* InitializeTrajectoryFile(char BaseName[]) {
+FILE* InitializeConfigurationFile(char BaseName[]) {
   // Generates base name
   char ConfigurationsFileName[100];
   strcpy(ConfigurationsFileName, BaseName);

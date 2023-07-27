@@ -33,8 +33,7 @@ void ReadInputFile(char inputsFilePath[]);
 
 FILE* InitializePropertiesDataFile(char BaseName[]);
 
-void  RecordInitialConfiguraiton(char BaseName[], CONFIGURATION Configuration);
-FILE* InitializeTrajectoryFile(char BaseName[]);
+FILE* InitializeConfigurationFile(char BaseName[]);
 void  RecordConfiguration(FILE* IntermediateConfigurationFile, CONFIGURATION Configuration);
 
 FILE* InitializeProfilesFile(char BaseName[]);
