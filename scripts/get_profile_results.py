@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import argparse
 import glob
-from sklearn.linear_model import LinearRegression
 from typing import List
 from multiprocessing import Pool
 
