@@ -2,6 +2,12 @@ import pandas as pd
 import glob
 import argparse
 
+"""
+In summary, this code reads multiple CSV files that match the 'summary' pattern in the current directory. 
+It extracts relevant data from each file, adds a 'filename' column, and concatenates the processed data 
+into a single dataframe. Finally, it saves the dataframe as a CSV file with the specified output name.
+"""
+
 # Importing necessary libraries
 
 def get_relevant_data(data):
