@@ -395,7 +395,7 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
             if (DistanceSquared < CUTOFF_SQUARED) {
               sigma = GetSigma(Configuration.Molecules[i].Atoms[j].Sigma, Configuration.Molecules[k].Atoms[l].Sigma);
               epsilon = GetEpsilon(Configuration.Molecules[i].Atoms[j].Epsilon, Configuration.Molecules[k].Atoms[l].Epsilon);
-              SigmaOverDistance6 = pow(sigma / DistanceSquared, 6);
+              SigmaOverDistance6 = pow(sigma, 6)/Cube(DistanceSquared);
               SigmaOverDistance12 = SigmaOverDistance6 * SigmaOverDistance6;
               potential = 4 * epsilon * (SigmaOverDistance12 - SigmaOverDistance6);
               Sum += potential;
