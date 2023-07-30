@@ -71,12 +71,17 @@ void CalculateOrderParameter(CONFIGURATION *Configuraiton){
   zVersor.x = zVersor.y = 0;
   zVersor.z = 1;
   for(int i = 0; i < Configuraiton->NumberMolecules; i++){
-    HeadTailVector = VectorSubtraction(
-      Configuraiton->Molecules[i].Atoms[Configuraiton->Molecules[i].Size - 1].Position, 
-      Configuraiton->Molecules[i].Atoms[0].Position
-    );
-    OrientationAngle = InternalAngle(HeadTailVector, zVersor);
-    Configuraiton->Molecules[i].OrderParameter = 0.5*(3.*Squared(cos(OrientationAngle)) - 1);
+    if(Configuraiton->Molecules[i].Size > 1){
+      HeadTailVector = VectorSubtraction(
+        Configuraiton->Molecules[i].Atoms[Configuraiton->Molecules[i].Size - 1].Position, 
+        Configuraiton->Molecules[i].Atoms[0].Position
+      );
+      OrientationAngle = InternalAngle(HeadTailVector, zVersor);
+      Configuraiton->Molecules[i].OrderParameter = 0.5*(3.*Squared(cos(OrientationAngle)) - 1);
+    }else{
+      Configuraiton->Molecules[i].OrderParameter = 0;
+    }
+    
   }
 }
 
