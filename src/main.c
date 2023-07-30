@@ -145,8 +145,7 @@ void RunSimulation(char* InputFileName){
 	PropertiesDataFile = InitializePropertiesDataFile(InputFileName);
 	ConfigurationsFile = InitializeConfigurationFile(InputFileName);
 	
-	if(SimulationBox.ClosedBox && ChainSize > 1)
-		ProfileFile = InitializeProfilesFile(InputFileName);
+	if(SimulationBox.ClosedBox) ProfileFile = InitializeProfilesFile(InputFileName);
 	
 	RecordConfiguration(ConfigurationsFile, OldConfiguration);
 
@@ -197,7 +196,7 @@ void RunSimulation(char* InputFileName){
 		if(MovementAccepted) CopyConfiguration(NewConfiguration, &OldConfiguration);
 		
 		if(StepsGetProfiles>0){
-			if((i%StepsGetProfiles==0 && SimulationBox.ClosedBox && ChainSize > 1)){
+			if((i%StepsGetProfiles==0 && SimulationBox.ClosedBox)){
 				GetCenterOfMassAllMolecules(&OldConfiguration);
 				CalculateOrderParameter(&OldConfiguration);
 				RecordProfileData(ProfileFile, OldConfiguration);
@@ -320,8 +319,7 @@ void RunSimulation(char* InputFileName){
 	RecordConfiguration(ConfigurationsFile, OldConfiguration);
 	if(SimulationBox.ClosedBox) fclose(ProfileFile);
 	fclose(ConfigurationsFile);
-	if(SimulationBox.ClosedBox && ChainSize > 1)
-		fclose(PropertiesDataFile);
+	fclose(PropertiesDataFile);
 
 	printf("\n");
 	printf("-----------------------------------------Simulation has finished--------------------------------------\n");
