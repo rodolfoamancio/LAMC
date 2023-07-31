@@ -55,3 +55,10 @@ This script consolidates the result of each `summary.csv` result into a single t
 $ python path/to/combine_summaries.py
 ```
 
+# get_profiles results.py
+
+This script post-process the raw `raw_profile.out.dat` files generated during the simulation. It requires the number of bins and number of threads. It should be executed in the folder where the referred `raw_profile.out.dat` are stored and will process any file which maches such pattern. Usage:
+
+```
+$ python path/to/get_profiles_results.py --number_bins=<number_bins> --cpus=<number_threads>
+```
