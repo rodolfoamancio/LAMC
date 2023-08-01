@@ -15,8 +15,8 @@ This code is divided into folders:
 ## Code compilation and utilization
 The main program is written in `C` and requires an adequate compiler (such as `gcc`). It can be compiled with the `MakeFile` available inside `src` folder:
 ```
-cd src
-make
+$ cd src
+$ make
 ```
 This will generate several `.o` files and an executable `LAMC.exe`. For running the program it is necessary to parse the input file with extension `.inp`. 
 
@@ -70,7 +70,7 @@ Each field is described below:
 
 Finally, the program can be run with:
 ```
-LAMC.exe <input_file>.inp
+$ LAMC.exe <input_file>.inp
 ```
 
 
