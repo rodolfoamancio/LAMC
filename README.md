@@ -68,6 +68,10 @@ Each field is described below:
 - `REFERENCE_POTENTIAL` - reference potential, either one or two values: `LENNARD_JONES` or `HARD_SPHERE`;
 - `PERTURBED_POTENTIAL` - perturbation potential, either one or two values: `LENNARD_JONES` or `HARD_SPHERE`;
 
+Finally, the program can be run with:
+```
+LAMC.exe <input_file>.inp
+```
 
 
 ## References
