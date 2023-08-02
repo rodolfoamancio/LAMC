@@ -44,9 +44,6 @@ void RunSimulation(char* InputFileName){
 
 	StartTime = time(&StartTime);
 	CountProductionStates=0;
-	ProbabilityCavityArray = (double*) calloc(MAX_NUMBER_MOLECULES, sizeof(double));
-	ProbabilityCavitySummed = (double*) calloc(MAX_NUMBER_MOLECULES, sizeof(double));
-	NumberCavityScan = (int*) calloc(MAX_NUMBER_MOLECULES, sizeof(int));
 	
 	MaxTranslationDistance = 0.5;
 	MaxLnVolumeChange = 0.1;
