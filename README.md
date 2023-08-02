@@ -5,6 +5,8 @@
 # LAMC - Linear alkanes Monte Carlo
 This repository centralizes the code implemented for research during my Master's of Science in Chemical Engineering at Unicamp.
 
+> “Ludwig Boltzmann, who spent much of his life studying statistical mechanics, died in 1906, by his own hand. Paul Ehrenfest, carrying on the work, died similarly in 1933. Now it is our turn to study statistical mechanics.” - D.L. Goodstein, States of Matter (1975).
+
 ## Structure
 This code is divided into folders:
 1. `src`: source code files, main components for running the program, implementation of Monte Carlo algorithms as well as properties calculations and input/output routines;
