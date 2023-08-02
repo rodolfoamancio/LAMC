@@ -43,6 +43,7 @@ DISPLACEMENT_PROBABILITY 0.33
 INSERTION_PROBABILITY 0.33
 DELETION_PROBABILITY 0.33
 FUGACITY 1000000.0
+PRESSURE 5000000.0
 REFERENCE_POTENTIAL LENNARD_JONES
 PERTURBED_POTENTIAL LENNARD_JONES
 ```
@@ -66,7 +67,8 @@ Each field is described below:
 - `DISPLACEMENT_PROBABILITY` - probability for performing a displacement attempt on `muVT` simulation;
 - `INSERTION_PROBABILITY` - probability for performing a molecule insertion attempt on `muVT` simulation;
 - `DELETION_PROBABILITY` - probability for performing a molecule deletion attempt on `muVT` simulation;
-- `FUGACITY` - fugacity for `muVT` simulation;
+- `FUGACITY` - fugacity in Pa for `muVT` simulation;
+- `PRESSURE` - pressure in Pa for `NPT` simulation;
 - `REFERENCE_POTENTIAL` - reference potential, either one or two values: `LENNARD_JONES` or `HARD_SPHERE`;
 - `PERTURBED_POTENTIAL` - perturbation potential, either one or two values: `LENNARD_JONES` or `HARD_SPHERE`;
 
