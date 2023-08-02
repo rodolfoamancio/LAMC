@@ -149,12 +149,12 @@ def get_profiles(filename: str) -> None:
                 splited_line = line.split()
 
                 if line_number == 0:
-                    box_x_size, box_y_size, box_z_size, _, molar_mass = map(float, splited_line)
+                    box_x_size, box_y_size, box_z_size, molar_mass = map(float, splited_line)
                     bin_centers = make_bin_centers(box_z_size, NUMBER_BINS)
                     bin_size = box_z_size / NUMBER_BINS
                     bin_volume = bin_size * box_x_size * box_y_size * 1.0E-30
 
-                if len(splited_line) == 5:
+                if len(splited_line) == 4:
                     if len(aux_df) > 0:
                         aux_df[['z', 'S']] = aux_df[['z', 'S']].astype(float)
                         aux_df['bin'] = aux_df['z'].apply(lambda z: get_bin(z, bin_centers))
