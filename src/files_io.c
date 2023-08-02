@@ -126,10 +126,6 @@ void ReadInputFile(char inputsFilePath[]){
     sscanf(InputData, "%d", &int_aux);
     SimulationBox.ClosedBox = int_aux == 1 ? true : false;
 
-   }else if(strcmp(InputName, "NUMBER_OF_BINS_FOR_PROFILE")==0){
-    sscanf(InputData, "%d", &int_aux);
-    NumberBinsForProfiles = int_aux;
-
    }else if(strcmp(InputName, "DISPLACEMENT_PROBABILITY")==0){
     sscanf(InputData, "%lf", &double_aux);
     DisplacementAttemptProbability = double_aux;
@@ -300,8 +296,6 @@ void RecordSimulationLog(char BaseName[]){
         LogFile, 
         "----------------------------------------------------------------------------------------------------------------\n"
         "                    Simulation in a closed box\n"
-        "Number of bins for profiles.....................: %d\n",
-        NumberBinsForProfiles
       );
   }
 
