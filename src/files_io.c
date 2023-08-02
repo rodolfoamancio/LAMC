@@ -440,11 +440,10 @@ FILE* InitializeProfilesFile(char BaseName[]){
 void RecordProfileData(FILE* ProfileFile, CONFIGURATION Configuration){
   fprintf(
    ProfileFile, 
-   "%f %f %f %d %f\n", 
+   "%f %f %f %f\n", 
    SimulationBox.xSize, 
    SimulationBox.ySize, 
    SimulationBox.zSize, 
-   NumberBinsForProfiles, 
    Configuration.Molecules[0].MolarMass
   );
   for(int i = 0; i < Configuration.NumberMolecules; i++){
