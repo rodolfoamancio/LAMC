@@ -46,17 +46,16 @@ def main():
     # List to store the processed dataframes for each file
     
     for filename in filename_list:
-        with pd.read_csv(filename) as raw_data:
-            # Read each file as a pandas dataframe
+        raw_data = pd.read_csv(filename)
+        selected_data = get_relevant_data(raw_data)
+        # Calls the get_relevant_data function to extract relevant data from the dataframe
+        
+        selected_data['filename'] = filename
+        # Adds a new column 'filename' and assigns the current filename as its value
+        
+        dfs.append(selected_data)
+        # Appends the processed dataframe to the list of dfs
             
-            selected_data = get_relevant_data(raw_data)
-            # Calls the get_relevant_data function to extract relevant data from the dataframe
-            
-            selected_data['filename'] = filename
-            # Adds a new column 'filename' and assigns the current filename as its value
-            
-            dfs.append(selected_data)
-            # Appends the processed dataframe to the list of dfs
     
     new_df = pd.concat(dfs, ignore_index=True)
     # Concatenates all the processed dataframes into a single dataframe
