@@ -28,29 +28,21 @@ def get_block_statistics(series, number_blocks):
     
     return overall_mean, std_dev
 
-
-import numpy as np
-
 def get_statistical_inefficiency_curve(series):
     total_size = len(series)
     std_total = series.std()
-    max_num_blocks = int(total_size / 10)
-    inverse_block_sizes = np.arange(2, max_num_blocks) / total_size
-    
+    max_num_blocks = int(total_size/10)
     std_list = []
     stat_ineff_list = []
-    
+    inverse_block_size_list = []
     for n_blocks in range(2, max_num_blocks):
-        block_size = total_size // n_blocks
-        means = series[:block_size * n_blocks].reshape((n_blocks, block_size)).mean(axis=1)
-        std = np.std(means)
-        
-        stat_ineff = (block_size * std**2) / (std_total**2)
-        
+        block_size = int(total_size/n_blocks)
+        _, std = get_block_statistics(series, n_blocks)
+        stat_ineff = block_size*(std**2)/(std_total**2)
+        inverse_block_size_list.append(n_blocks/total_size)
         std_list.append(std)
         stat_ineff_list.append(stat_ineff)
-    
-    return np.array(inverse_block_sizes).reshape(-1, 1), np.array(stat_ineff_list).reshape(-1, 1)
+    return np.array(inverse_block_size_list).reshape(-1,1), np.array(stat_ineff_list).reshape(-1,1)
 
 def get_series_statistics(series):
     if series.nunique() > 2:
@@ -65,11 +57,20 @@ def get_series_statistics(series):
         estimated_statistical_inefficiency = 'NA'
     
     mean = series.mean()
+
+    results = pd.DataFrame({
+            "Property":series.name,
+            "Mean":mean,
+            "STD":std_corrected,
+            "Statistical inefficiency":estimated_statistical_inefficiency
+        },
+        index=[0]
+    )
     
-    return pd.DataFrame({'Property': series.name, 'Mean': mean, 'STD': std_corrected, 'Statistical inefficiency': estimated_statistical_inefficiency}, index=[0])
+    return results
 
 def get_summary(production_data):
-    summary_df = pd.DataFrame(columns=['Property', 'Mean', 'STD', 'Statistical inefficiency'])
+    
     properties = [
         'temperature',
         'volume',
@@ -95,10 +96,12 @@ def get_summary(production_data):
     ]
     
     production_data = production_data.apply(pd.to_numeric, errors='coerce')
-    
+    dfs = []
     for column in properties:
         if column in production_data.columns:
-            summary_df = pd.concat([summary_df, get_series_statistics(production_data[column])])
+            dfs.append(get_series_statistics(production_data[column]))
+
+    summary_df = pd.concat(dfs)
 
     return summary_df
 
@@ -109,10 +112,11 @@ def get_properties_summary(filename):
         raw_data = pd.read_csv(filename, sep='\s+')
         production_data = raw_data.loc[int(raw_data.shape[0]/2):].reset_index(drop=True)
         
+
         object_columns = production_data.select_dtypes(include=['object']).columns
         production_data[object_columns] = production_data[object_columns].apply(pd.to_numeric, errors='coerce')
 
-        production_data.dropna(inplace=True)
+        
         results_summary = get_summary(production_data).set_index('Property')
 
         if 'weight_ghost_molecule' in production_data.columns:
