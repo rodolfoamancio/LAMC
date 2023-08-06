@@ -13,7 +13,7 @@ def argparser():
     parser.add_argument('--cpus', type=int, required=False, default=1)
     return parser.parse_args()
 
-def get_block_statistics(series, number_blocks):
+def get_block_std(series, number_blocks):
     total_size = len(series)
     block_size = int(total_size / number_blocks)
     block_means = []
@@ -23,21 +23,20 @@ def get_block_statistics(series, number_blocks):
         block_mean = subset.mean()
         block_means.append(block_mean)
     
-    overall_mean = np.mean(block_means)
     std_dev = np.std(block_means)
     
-    return overall_mean, std_dev
+    return std_dev
 
 def get_statistical_inefficiency_curve(series):
     total_size = len(series)
     std_total = series.std()
-    max_num_blocks = int(total_size/10)
+    n_blocks_array = np.linspace(2, int(total_size/10), 50, dtype=int)
     std_list = []
     stat_ineff_list = []
     inverse_block_size_list = []
-    for n_blocks in range(2, max_num_blocks):
+    for n_blocks in n_blocks_array:
         block_size = int(total_size/n_blocks)
-        _, std = get_block_statistics(series, n_blocks)
+        std = get_block_std(series, n_blocks)
         stat_ineff = block_size*(std**2)/(std_total**2)
         inverse_block_size_list.append(n_blocks/total_size)
         std_list.append(std)
