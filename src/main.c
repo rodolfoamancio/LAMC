@@ -30,7 +30,7 @@ void RunSimulation(char* InputFileName){
   double PotentialNonbonded, PotentialBonded, PotentialWalls, PotentialLongRangeCorrection, PotentialTotal, PotentialPerturbed;
   double WeightGhostMolecule;
   double DensityMolar, DensityMass;
-  double *WeightIdealChainSamples, STDWeightIdealChain;  
+  double WeightIdealChainSample, WeightIdealChainSquared, STDWeightIdealChain;  
   int CountMovements = 0;
   int ProductionFlag = 0;
   int OptimizeAcceptanceEverySteps, OptimizeAcceptanceEveryCycles;
@@ -105,25 +105,21 @@ void RunSimulation(char* InputFileName){
   InitializeConfiguration(&NewConfiguration);
 
   printf("--------------------------------------------Ideal chain calculations----------------------------------\n");
-  WeightIdealChainSamples = (double*) calloc(NUMBER_SAMPLES_IDEAL_CHAIN, sizeof(double));
-  WeightIdealChain = 0.0;
+  WeightIdealChain=WeightIdealChainSquared=0.0;
   for(int i=0; i<NUMBER_SAMPLES_IDEAL_CHAIN; i++){
-    WeightIdealChainSamples[i] = GetRosenbluthWeightIdealChain(OldConfiguration.Molecules[0]);
-    WeightIdealChain += WeightIdealChainSamples[i];
+    WeightIdealChainSample = GetRosenbluthWeightIdealChain(OldConfiguration.Molecules[0]);
+    WeightIdealChain += WeightIdealChainSample;
+    WeightIdealChainSquared += Squared(WeightIdealChainSample);
   }
   WeightIdealChain /= NUMBER_SAMPLES_IDEAL_CHAIN;
-  STDWeightIdealChain = 0.0;
-  for(int i=0; i<NUMBER_SAMPLES_IDEAL_CHAIN; i++){
-    STDWeightIdealChain += Squared(WeightIdealChainSamples[i] - WeightIdealChain);
-  }
-  STDWeightIdealChain /= (NUMBER_SAMPLES_IDEAL_CHAIN - 1);
+  WeightIdealChainSquared /= NUMBER_SAMPLES_IDEAL_CHAIN;
+  STDWeightIdealChain = sqrt(WeightIdealChainSquared - WeightIdealChain);
 
-
-  
   printf(
     "Weight ideal chain:........................: %f\n"
+    "STD Weight ideal chain:....................: %f\n"
     "------------------------------------------------------------------------------------------------------\n\n", 
-    WeightIdealChain
+    WeightIdealChain, STDWeightIdealChain
   );
 
   printf("\n----------------------------------------Generating initial configuration------------------------------\n\n");
@@ -205,7 +201,7 @@ void RunSimulation(char* InputFileName){
         SimulationBox.zSize, OldConfiguration.NumberMolecules, DensityMass, DensityMolar,
         PotentialTotal, PotentialBonded, PotentialNonbonded, PotentialLongRangeCorrection, 
         PotentialWalls, PotentialPerturbed, WeightIdealChain, STDWeightIdealChain, 
-        WeightGhostMolecule, PressureTotal, PressureExcess, PressureIdealGas, PressureLongRangeCorrection // 25
+        WeightGhostMolecule, PressureTotal, PressureExcess, PressureIdealGas, PressureLongRangeCorrection
       );
 
       if(ProductionFlag==1){
