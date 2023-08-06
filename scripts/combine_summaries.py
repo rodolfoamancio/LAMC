@@ -13,13 +13,24 @@ into a single dataframe. Finally, it saves the dataframe as a CSV file with the 
 def get_relevant_data(data):
     # Function to extract relevant data from the input dataframe
     # It selects columns 'Property', 'Mean' and 'STD', assigns new column names, and concatenates them
-    
-    mean_properties = data[['Property', 'Mean']].assign(Property=lambda x: 'mean_' + x['Property']).rename(columns={'Mean':'value'}, inplace=True)
+    mean_properties = (
+        data
+        .copy()
+        [['Property', 'Mean']]
+        .assign(Property=lambda x: 'mean_' + x['Property'])
+        .rename(columns={'Mean':'value'})
+    )
     # Selects columns 'Property' and 'Mean' from the input dataframe
     # Assigns a new column name by adding 'mean_' prefix to each value in the 'Property' column
     # Renames the 'Mean' column as 'value'
     
-    std_properties = data[['Property', 'STD']].assign(Property=lambda x: 'std_' + x['Property']).rename(columns={'STD':'value'}, inplace=True)
+    std_properties = (
+        data
+        .copy()
+        [['Property', 'STD']]
+        .assign(Property=lambda x: 'std_' + x['Property'])
+        .rename(columns={'STD':'value'})
+    )
     # Selects columns 'Property' and 'STD' from the input dataframe
     # Assigns a new column name by adding 'std_' prefix to each value in the 'Property' column
     # Renames the 'STD' column as 'value'
@@ -46,7 +57,7 @@ def main():
     # List to store the processed dataframes for each file
     
     for filename in filename_list:
-        raw_data = pd.read_csv(filename)
+        raw_data = pd.read_csv(filename, header=None, names=["Property", "Mean", "STD", "Statistical inefficiency"], skiprows=[0])
         selected_data = get_relevant_data(raw_data)
         # Calls the get_relevant_data function to extract relevant data from the dataframe
         
