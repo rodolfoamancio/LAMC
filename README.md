@@ -22,6 +22,8 @@ $ make
 ```
 This will generate several `.o` files and an executable `LAMC.exe`. For running the program it is necessary to parse the input file with extension `.inp`. 
 
+### Input files
+
 An input file is a text file specifying the simulation parameters, with the following structure:
 ```
 SIMULATION_ENSEMBLE NVT
@@ -76,6 +78,14 @@ Finally, the program can be run with:
 ```
 $ LAMC.exe <input_file>.inp
 ```
+
+### Output files
+
+Once the code is executed and the simulation is complete four files will be generated for analysis. Each file name is constructed from the original filename of the input file, considering for instance an input file with name `<input_filename>.inp` the generated files will be:
+- `<input_filename>_properties_data.out.dat`: a file containing the sampled properties every `CYCLES_TO_CALCULATE_PROPERTIES` cycles;
+- `<input_filename>_configurations.out.xyz`: a file containg the configuration sampled every `CYCLES_TO_RECORD_CONFIGURAITON`;
+- `<input_filename>.out.log`: a file containng the simulation summary;
+- `<inout_filename>_properties_data.out.dat`: a file containg the raw profiles data *id est* the center of mass position on the `z` axis of each molecule and the corresponding orientation parameter (evaluated as the second Legendre polynomial). This file is only generated for closed box simulations and the orientation parameter is only calculated if `CHAIN_SIZE` is bigger than or equal to 2.
 
 
 ## References
