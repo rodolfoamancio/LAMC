@@ -85,7 +85,7 @@ Once the code is executed and the simulation is complete four files will be gene
 - `<input_filename>_properties_data.out.dat`: a file containing the sampled properties every `CYCLES_TO_CALCULATE_PROPERTIES` cycles;
 - `<input_filename>_configurations.out.xyz`: a file containing the configuration sampled every `CYCLES_TO_RECORD_CONFIGURAITON`;
 - `<input_filename>.out.log`: a file containing the simulation summary;
-- `<inout_filename>_properties_data.out.dat`: a file containing the raw profiles data *id est* the center of mass position on the `z` axis of each molecule and the corresponding orientation parameter (evaluated as the second Legendre polynomial). This file is only generated for closed box simulations and the orientation parameter is only calculated if `CHAIN_SIZE` is bigger than or equal to 2.
+- `<input_filename>_properties_data.out.dat`: a file containing the raw profiles data *id est* the center of mass position on the `z` axis of each molecule and the corresponding orientation parameter (evaluated as the second Legendre polynomial). This file is only generated for closed box simulations and the orientation parameter is only calculated if `CHAIN_SIZE` is bigger than or equal to 2.
 
 ### Post-processing
 The files generated during the simulation can be processed to generate relevant statistics and other results for analysis. Inside the folder `scripts` there are pre-implemented codes for these tasks alongside a `README.md` with a detailed explanation on each `.py` file.
