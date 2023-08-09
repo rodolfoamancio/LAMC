@@ -90,6 +90,9 @@ Once the code is executed and the simulation is complete four files will be gene
 ### Post-processing
 The files generated during the simulation can be processed to generate relevant statistics and other results for analysis. Inside the folder `scripts` there are pre-implemented codes for these tasks alongside a `README.md` with a detailed explanation on each `.py` file.
 
+### Multiprocessing
+Monte Carlo algorithms are intrinsically serial structures, however multiple independent simulations can be executed in parallel. For such cases the script `run_multiprocessing.py` in the folder `scripts` can be used. Further details at the `README.md` file on the corresponding folder.
+
 ## References
 The development of this code has been made possible by several research materials mainly, but not restricted, to:
 1. Frenkel, Daan, and Berend Smit. Understanding molecular simulation: from algorithms to applications. Vol. 1. Elsevier, 2001.
