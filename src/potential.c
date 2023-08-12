@@ -12,58 +12,46 @@
 
 enum PotentialType ReferencePotential, PerturbationPotential;
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetPotentialStretching
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates the potential energy due to stretching.
- * Parameters |
- *              - d: The displacement from the equilibrium 
- *                distance.
- * Returns    | 
- *              The potential energy in atomic units.
- ****************************************************************/
+ * Parameters | - d: The displacement from the equilibrium distance.
+ * Returns    | The potential energy in atomic units.
+ * **************************************************************************************************************/
 double GetPotentialStreaching(double d){
   return (kStreaching/2.0)*pow(d - dEq, 2);
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetPotentialBending
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates the potential energy due to bending.
- * Parameters |
- *              - theta: The angular displacement from equilibrium.
- * Returns    | 
- *              The potential energy in atomic units.
- ****************************************************************/
+ * Parameters | - theta: The angular displacement from equilibrium.
+ * Returns    | The potential energy in atomic units.
+ * **************************************************************************************************************/
 double GetPotentialBending(double theta){
   return (kBending/2.0)*pow(theta - thetaEq, 2);
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetPotentialTorsion
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates the potential energy due to torsion.
- * Parameters |
- *              - phi: Torsinal angle.
- * Returns    | 
- *              The potential energy in atomic units.
- ****************************************************************/
+ * Parameters | - phi: Torsinal angle.
+ * Returns    | The potential energy in atomic units.
+ * **************************************************************************************************************/
 double GetPotentialTorsion(double phi){
   return (cTorsion[0]*(1 + cos(phi)) + cTorsion[1]*(1 - cos(2*phi)) + cTorsion[2]*(1 + cos(3*phi)));
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetPotentialBonded
- * -------------------------------------------------------------
- * Function   | Calculates the potential energy of a bonded 
- *              configuration.
- * Parameters |
- *              - Configuration: The configuration containing 
- *                the molecules and their atoms.
- * Returns    | 
- *              The total potential energy of the bonded 
- *              configuration.
- ****************************************************************/
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Calculates the potential energy of a bonded configuration.
+ * Parameters | - Configuration: The configuration containing the molecules and their atoms.
+ * Returns    | The total potential energy of the bonded configuration.
+ * **************************************************************************************************************/
 double GetPotentialBonded(CONFIGURATION Configuration) {
   double total = 0;
   
@@ -104,14 +92,12 @@ double GetPotentialBonded(CONFIGURATION Configuration) {
   return total;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | SampleBondLength
- * -------------------------------------------------------------
- * Function   | Samples a bond length from a probability 
- *              distribution.
- * Returns    | 
- *              The sampled bond length.
- ****************************************************************/
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Samples a bond length from a probability distribution.
+ * Returns    | The sampled bond length.
+ * **************************************************************************************************************/
 double SampleBondLength(void){
   double sigma = sqrt(1./(Beta*kStreaching));
   double a = 1.0/Squared((dEq + 3.*sigma));
@@ -122,17 +108,14 @@ double SampleBondLength(void){
   return d;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | SampleBendingAngle
- * -------------------------------------------------------------
- * Function   | Samples an orientation vector with a bending angle 
- *              following a certain probability distribution.
- * Parameters |
- *              - r1: Vector representing the position of atom 1.
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Samples an orientation vector with a bending angle following a certain probability distribution.
+ * Parameters | - r1: Vector representing the position of atom 1.
  *              - r2: Vector representing the position of atom 2.
- * Returns    | 
- *              The sampled orientation vector.
- ****************************************************************/
+ * Returns    | The sampled orientation vector.
+ * **************************************************************************************************************/
 VECTOR SampleBendingAngle(VECTOR r1, VECTOR r2){
   bool ready = false;
   VECTOR OrientationVector;
@@ -145,19 +128,16 @@ VECTOR SampleBendingAngle(VECTOR r1, VECTOR r2){
   return OrientationVector;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | SampleBendingTorsionAngles
- * -------------------------------------------------------------
- * Function   | Samples an orientation vector with bending and 
- *              torsion angles following a certain probability 
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Samples an orientation vector with bending and torsion angles following a certain probability 
  *              distribution.
- * Parameters |
- *              - r1: Vector representing the position of atom 1.
+ * Parameters | - r1: Vector representing the position of atom 1.
  *              - r2: Vector representing the position of atom 2.
  *              - r3: Vector representing the position of atom 3.
- * Returns    | 
- *              The sampled orientation vector.
- ****************************************************************/
+ * Returns    | The sampled orientation vector.
+ * **************************************************************************************************************/
 VECTOR SampleBendingTorsionAngles(VECTOR r1, VECTOR r2, VECTOR r3){
   bool ready = false;
   VECTOR OrientationVector, r4;
@@ -172,18 +152,15 @@ VECTOR SampleBendingTorsionAngles(VECTOR r1, VECTOR r2, VECTOR r3){
   return OrientationVector;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetPartialExternalPotential
- * -------------------------------------------------------------
- * Function   | Calculates the partial external potential for a 
- *              given reference molecule and reference particle.
- * Parameters |
- *              - Configuration: The configuration of molecules.
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Calculates the partial external potential for a given reference molecule and reference particle.
+ * Parameters | - Configuration: The configuration of molecules.
  *              - referenceMolecule: The index of the reference molecule.
  *              - referenceParticle: The index of the reference particle.
- * Returns    | 
- *              The calculated partial external potential.
- ****************************************************************/
+ * Returns    | The calculated partial external potential.
+ * **************************************************************************************************************/
 POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int referenceMolecule, int referenceParticle){
   POTENTIAL PartialPotential;
   VECTOR SeparationVector;
@@ -242,15 +219,13 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
   return PartialPotential;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetPotentialExternalField
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates the external potential for a given atom.
- * Parameters |
- *              - Atom: The atom for which to calculate the potential.
- * Returns    | 
- *              The calculated external potential.
- ****************************************************************/
+ * Parameters | - Atom: The atom for which to calculate the potential.
+ * Returns    | The calculated external potential.
+ * **************************************************************************************************************/
 POTENTIAL GetPotentialExternalField(ATOM Atom) {
   POTENTIAL AuxPotentialExternalField;
 
@@ -277,19 +252,15 @@ POTENTIAL GetPotentialExternalField(ATOM Atom) {
   return AuxPotentialExternalField;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetPotentialGradient
- * -------------------------------------------------------------
- * Function   | Calculates the gradient of the potential between 
- *              two atoms.
- * Parameters |
- *              - SeparationVector: Vector representing the 
- *                distance between AtomA and AtomB.
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Calculates the gradient of the potential between two atoms.
+ * Parameters | - SeparationVector: Vector representing the distance between AtomA and AtomB.
  *              - AtomA: First atom.
  *              - AtomB: Second atom.
- * Returns    | 
- *              The calculated potential gradient vector.
- ****************************************************************/
+ * Returns    | The calculated potential gradient vector.
+ * **************************************************************************************************************/
 VECTOR GetPotentialGradient(VECTOR SeparationVector, ATOM AtomA, ATOM AtomB) {
   VECTOR PotentialGradient;
   double Sigma, Epsilon;
@@ -325,16 +296,14 @@ VECTOR GetPotentialGradient(VECTOR SeparationVector, ATOM AtomA, ATOM AtomB) {
 }
 
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetPotentialSteele
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates the Steele potential for an atom.
- * Parameters |
- *              - Atom: Atom for which the Steele potential is calculated.
+ * Parameters | - Atom: Atom for which the Steele potential is calculated.
  *              - height: Height parameter for the calculation.
- * Returns    | 
- *              The calculated Steele potential.
- ****************************************************************/
+ * Returns    | The calculated Steele potential.
+ * **************************************************************************************************************/
 double GetPotentialSteele(ATOM Atom, double height) {
   double carbonDensity = 114.0E27;
   double interlayerSpacing = 3.35 * ANGSTRON;
@@ -357,19 +326,14 @@ double GetPotentialSteele(ATOM Atom, double height) {
   return SteelePotential;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetPotentialNonbonded
- * -------------------------------------------------------------
- * Function   | Calculates the potential energy between 
- *              non-bonded atoms using the Lennard-Jones potential.
- * Parameters |
- *              - Configuration: The configuration of the 
- *                system containing molecules and atoms.
- *              - Potential: The type of potential to be 
- *                calculated (Lennard-Jones in this case).
- * Returns    | 
- *              The total potential energy calculated.
- ****************************************************************/
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Calculates the potential energy between non-bonded atoms using the Lennard-Jones potential.
+ * Parameters | - Configuration: The configuration of the system containing molecules and atoms.
+ *              - Potential: The type of potential to be calculated (Lennard-Jones in this case).
+ * Returns    | The total potential energy calculated.
+ * **************************************************************************************************************/
 double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Potential) {
   VECTOR SeparationVector;
   double Sum = 0.0;
@@ -409,17 +373,13 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
   return Sum;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetTotalPotentialExternal
- * -------------------------------------------------------------
- * Function   | Calculates the total potential energy between 
- *              external atoms using the specified potential field.
- * Parameters |
- *              - Configuration: The configuration of the system
- *                containing molecules and atoms.
- * Returns    | 
- *              The total potential energy calculated.
- ****************************************************************/
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Calculates the total potential energy between external atoms using the specified potential field.
+ * Parameters | - Configuration: The configuration of the systemcontaining molecules and atoms.
+ * Returns    | The total potential energy calculated.
+ * **************************************************************************************************************/
 double GetTotalPotentialExternal(CONFIGURATION Configuration){
   double total = 0;
   bool overlap = false;
@@ -432,19 +392,14 @@ double GetTotalPotentialExternal(CONFIGURATION Configuration){
   return total;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetPotentialLongRangeCorrection
- * -------------------------------------------------------------
- * Function   | Calculates the long-range correction to the total 
- *              potential energy between atoms in the system using 
- *              the specified potential field.
- * Parameters |
- *              - Configuration: The configuration of the system
- *                containing molecules and atoms.
- * Returns    | 
- *              The calculated long-range correction to the total 
- *              potential energy.
- ****************************************************************/
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Calculates the long-range correction to the total potential energy between atoms in the system 
+ *              using the specified potential field.
+ * Parameters | - Configuration: The configuration of the system containing molecules and atoms.
+ * Returns    | The calculated long-range correction to the total potential energy.
+ * **************************************************************************************************************/
 double GetPotentialLongRangeCorrection(CONFIGURATION Configuration) {
   double PotentialLongRangeCorrection = 0.0;
   
@@ -492,16 +447,13 @@ double GetPotentialLongRangeCorrection(CONFIGURATION Configuration) {
   return PotentialLongRangeCorrection;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | ComputeNonbondedForces
- * -------------------------------------------------------------
- * Function   | Calculates the nonbonded forces between atoms in 
- *              the system using the specified potential field.
- * Parameters |
- *              - Configuration: The configuration of the system
- *                containing molecules and atoms.
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Calculates the nonbonded forces between atoms in the system using the specified potential field.
+ * Parameters | - Configuration: The configuration of the system containing molecules and atoms.
  * Returns    | None
- ****************************************************************/
+ * **************************************************************************************************************/
 void ComputeNonbondedForces(CONFIGURATION *Configuration){
   VECTOR Force;
   VECTOR SeparationVector;
