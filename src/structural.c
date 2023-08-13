@@ -10,15 +10,15 @@
  * **************************************************************************************************************/
 #include"structural.h"
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetMoleculeCenterOfMass
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates the center of mass position of the 
  *              molecule
  * Parameters | Molecule: a MOLECULE struct type variable
  * Returns    | The VECTOR struct witht the position of the 
  *              center of mass
- ****************************************************************/
+ * **************************************************************************************************************/
 VECTOR GetMoleculeCenterOfMass(MOLECULE Molecule) {
   VECTOR CenterOfMass;
   double totalMass = 0.0; // Track the total mass of the molecule
@@ -41,15 +41,15 @@ VECTOR GetMoleculeCenterOfMass(MOLECULE Molecule) {
   return CenterOfMass;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetCenterOfMassAllMolecules
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates the center of mass position of all 
  *              molecules in a given configuration
  * Parameters | Configuration: a pointer to a CONFIGURATION 
  *              struct type variable
  * Returns    | None
- ****************************************************************/
+ * **************************************************************************************************************/
 void GetCenterOfMassAllMolecules(CONFIGURATION *Configuration){
   for(int i = 0; i < Configuration->NumberMolecules; i++){
     Configuration->Molecules[i].CenterOfMass = GetMoleculeCenterOfMass(Configuration->Molecules[i]);
@@ -57,14 +57,14 @@ void GetCenterOfMassAllMolecules(CONFIGURATION *Configuration){
 }
 
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | CalculateOrderParameter
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates the order parameter for each molecule 
  *              in a given configuration
  * Parameters | Configuration: a pointer to a CONFIGURATION struct
  * Returns    | None
- ****************************************************************/
+ * **************************************************************************************************************/
 void CalculateOrderParameter(CONFIGURATION *Configuraiton){
   VECTOR HeadTailVector, zVersor;
   double OrientationAngle;
@@ -85,26 +85,26 @@ void CalculateOrderParameter(CONFIGURATION *Configuraiton){
   }
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetDensityMolar
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates and returns the molar density based on 
  *              the given configuration
  * Parameters | Configuration: the configuration of the system
  * Returns    | The molar density
- ****************************************************************/
+ * **************************************************************************************************************/
 double GetDensityMolar(CONFIGURATION Configuration){
   return Configuration.NumberMolecules/(SimulationBox.volume*Cube(ANGSTRON)*AVOGADRO_NUMBER);
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetDensityMass
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates and returns the mass density based on 
  *              the given configuration
  * Parameters | Configuration: the configuration of the system
  * Returns    | The mass density
- ****************************************************************/
+ * **************************************************************************************************************/
 double GetDensityMass(CONFIGURATION Configuration){
   double TotalMass = 0;
   for(int i = 0; i < Configuration.NumberMolecules; i++){
