@@ -10,9 +10,9 @@
  * **************************************************************************************************************/
 #include"properties.h"
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetPotentialLongRangeCorrection
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates the long-range correction to the total 
  *              potential energy between atoms in the system using 
  *              the specified potential field.
@@ -22,7 +22,7 @@
  * Returns    | 
  *              The calculated long-range correction to the total 
  *              potential energy.
- ****************************************************************/
+ * **************************************************************************************************************/
 double GetPressureLongRangeCorrection(CONFIGURATION Configuration){
   ATOM   AtomA, AtomB;
   int    NumberPesudoAtoms[3] = {0, 0, 0};
@@ -70,9 +70,9 @@ double GetPressureLongRangeCorrection(CONFIGURATION Configuration){
   return 16.*M_PI*AuxInteractions/(3.*Squared(VolumeCubicMeters));
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetPressureIdealGas
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates the pressure of an ideal gas using the 
  *              given number of molecules and volume.
  * Parameters |
@@ -81,20 +81,20 @@ double GetPressureLongRangeCorrection(CONFIGURATION Configuration){
  *              - volume: The volume of the system in cubic meters.
  * Returns    | 
  *              The calculated pressure of the ideal gas.
- ****************************************************************/
+ * **************************************************************************************************************/
 double GetPressureIdealGas(int numberOfMolecules, double volume){
   volume = volume*Cube(ANGSTRON);
   return numberOfMolecules*BOLTZMANN_CONSTANT*Temperature/volume;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetPressureExcess
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates the excess pressure of the system
  * Parameters | Configuration: CONFIGURATION struc withe the
  *              system's configuration
  * Returns    | The excess pressure
- ****************************************************************/
+ * **************************************************************************************************************/
 double GetPressureExcess(CONFIGURATION Configuration){
   VECTOR Position, CenterOfMass, Force;
   double Average;
