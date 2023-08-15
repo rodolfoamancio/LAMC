@@ -14,61 +14,62 @@
 DOUBLE_MATRIX_3X3 StrainDerivativeTensor;
 BOX SimulationBox;
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | Norm
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculate the norm of a 3D vector.
  * Parameters | r: The input vector (type: VECTOR)
  * Returns    | The norm of the input vector (type: double)
- ****************************************************************/
+ * **************************************************************************************************************/
 double Norm(VECTOR r){
   return sqrt(Squared(r.x) + Squared(r.y) + Squared(r.z));
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | NormSquared
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculate the square of the norm of a 3D vector.
  * Parameters | r: The input vector (type: VECTOR)
  * Returns    | The square of the norm of the input vector (type: double)
- ****************************************************************/
+ * **************************************************************************************************************/
 double NormSquared(VECTOR r){
   return (Squared(r.x) + Squared(r.y) + Squared(r.z));
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | CalculateDistance
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculate the distance between two 3D vectors.
  * Parameters | r1: The first input vector (type: VECTOR)
  *              r2: The second input vector (type: VECTOR)
  * Returns    | The distance between the two input vectors (type: double)
- ****************************************************************/
+ * **************************************************************************************************************/
 double CalculateDistance(VECTOR r1, VECTOR r2){
   VECTOR rDifference;
   rDifference = VectorSubtraction(r1, r2);
   return Norm(rDifference);
 }
 
-/***************************************************************
- * Name       | 
- * -------------------------------------------------------------
- * Function   | 
- * Parameters | 
- * Returns    | 
- ****************************************************************/
-double DotProduct(VECTOR r1, VECTOR r2){
-  return r1.x*r2.x + r1.y*r2.y + r1.z*r2.z;
-}
-
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | DotProduct
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculate the dot product of two 3D vectors.
  * Parameters | r1: The first input vector (type: VECTOR)
  *              r2: The second input vector (type: VECTOR)
  * Returns    | The dot product of the two input vectors (type: double)
- ****************************************************************/
+ * **************************************************************************************************************/
+double DotProduct(VECTOR r1, VECTOR r2){
+  return r1.x*r2.x + r1.y*r2.y + r1.z*r2.z;
+}
+
+/* ***************************************************************************************************************
+ * Name       | InternalAngle
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Computes the internal angle between two three-dimensional arrays
+ * Parameters | r1: The first input vector (type: VECTOR)
+ *              r2: The second input vector (type: VECTOR)
+ * Returns    | The internal angle between the vectors in radians (type double)
+ * **************************************************************************************************************/
 double InternalAngle(VECTOR r1, VECTOR r2){
   double r1Norm = Norm(r1);
   double r2Norm = Norm(r2);
@@ -90,15 +91,14 @@ double InternalAngle(VECTOR r1, VECTOR r2){
   return angle;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | VectorSubtraction
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Subtract two 3D vectors element-wise.
  * Parameters | r1: The first vector (type: VECTOR)
  *              r2: The second vector (type: VECTOR)
  * Returns    | The resulting vector after subtracting r2 from r1 (type: VECTOR)
- ****************************************************************/
-
+ * **************************************************************************************************************/
 VECTOR VectorSubtraction(VECTOR r1, VECTOR r2){
   VECTOR rDifference;
   rDifference.x = r1.x - r2.x;
@@ -107,14 +107,14 @@ VECTOR VectorSubtraction(VECTOR r1, VECTOR r2){
   return rDifference;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | VectorSum
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Add two 3D vectors element-wise.
  * Parameters | r1: The first vector (type: VECTOR)
  *              r2: The second vector (type: VECTOR)
  * Returns    | The resulting vector after adding r1 and r2 together (type: VECTOR)
- ****************************************************************/
+ * **************************************************************************************************************/
 VECTOR VectorSum(VECTOR r1, VECTOR r2){
   VECTOR rSum;
   rSum.x = r1.x + r2.x;
@@ -123,16 +123,14 @@ VECTOR VectorSum(VECTOR r1, VECTOR r2){
   return rSum;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | CrossProduct
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculate the cross product of two 3D vectors.
  * Parameters | r1: The first vector (type: VECTOR)
  *              r2: The second vector (type: VECTOR)
- * Returns    | The resulting vector after calculating the 
- *              cross product of r1 and r2 (type: VECTOR)
- ****************************************************************/
-
+ * Returns    | The resulting vector after calculating the cross product of r1 and r2 (type: VECTOR)
+ * **************************************************************************************************************/
 VECTOR CrossProduct(VECTOR r1, VECTOR r2){
   VECTOR VectorCrossProduct;
   VectorCrossProduct.x =  r1.y*r2.z - r1.z*r2.y;
@@ -141,13 +139,13 @@ VECTOR CrossProduct(VECTOR r1, VECTOR r2){
   return VectorCrossProduct;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | NormalizeVector
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Normalize a 3D vector.
  * Parameters | r: The vector to be normalized (type: VECTOR)
  * Returns    | The normalized vector (type: VECTOR)
- ****************************************************************/
+ * **************************************************************************************************************/
 VECTOR NormalizeVector(VECTOR r){
   VECTOR Normalized;
   double rNorm = Norm(r);
@@ -157,14 +155,14 @@ VECTOR NormalizeVector(VECTOR r){
   return Normalized;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | MultiplyVectorScalar
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Multiply a vector by a scalar.
  * Parameters | r: The vector to be multiplied (type: VECTOR)
  *            | a: The scalar to multiply with (type: double)
  * Returns    | The resulting vector (type: VECTOR)
- ****************************************************************/
+ * **************************************************************************************************************/
 VECTOR MultiplyVectorScalar(VECTOR r, double a){
   VECTOR Result;
   Result.x = a*r.x;
@@ -173,13 +171,13 @@ VECTOR MultiplyVectorScalar(VECTOR r, double a){
   return Result;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | RandomUnitVector
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Generate a random unit vector.
  * Parameters | None
  * Returns    | The generated random unit vector (type: VECTOR)
- ****************************************************************/
+ * **************************************************************************************************************/
 VECTOR RandomUnitVector(){
   VECTOR RandomVector;
   double ransq = 2., ran1, ran2;
@@ -195,25 +193,24 @@ VECTOR RandomUnitVector(){
   return RandomVector;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | MatrixTrace
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculate the trace of a 3x3 matrix.
  * Parameters | Matrix: The input 3x3 matrix (type: DOUBLE_MATRIX_3X3)
  * Returns    | The sum of the diagonal elements of the matrix (type: double)
- ****************************************************************/
+ * **************************************************************************************************************/
 double MatrixTrace(DOUBLE_MATRIX_3X3 Matrix){
   return Matrix.xx + Matrix.yy + Matrix.zz;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | ApplyPeriodicBoundaryConditionsVector
- * -------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------------------------------
  * Function   | Apply periodic boundary conditions to a vector.
  * Parameters | r: The input vector (type: VECTOR)
- * Returns    | The transformed vector after applying the 
- *              periodic boundary conditions (type: VECTOR)
- ****************************************************************/
+ * Returns    | The transformed vector after applying the periodic boundary conditions (type: VECTOR)
+ * **************************************************************************************************************/
 VECTOR ApplyPeriodicBoundaryConditionsVector(VECTOR r){
   VECTOR rTransformed = r;
   rTransformed.x = r.x - SimulationBox.xSize*round(r.x/SimulationBox.xSize);
@@ -225,15 +222,13 @@ VECTOR ApplyPeriodicBoundaryConditionsVector(VECTOR r){
   return rTransformed;
 }
 
-/***************************************************************
+/* ***************************************************************************************************************
  * Name       | GetRandomPosition
- * -------------------------------------------------------------
- * Function   | Generate a random position vector within the 
- *              simulation box.
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Generate a random position vector within the simulation box.
  * Parameters | None
- * Returns    | The randomly generated position vector 
- *              (type: VECTOR)
- ****************************************************************/
+ * Returns    | The randomly generated position vector (type: VECTOR)
+ * **************************************************************************************************************/
 VECTOR GetRandomPosition(void){
   VECTOR RandomPosition;
   RandomPosition.x = GetRandomDoubleInterval(SimulationBox.xMin, SimulationBox.xMax);
