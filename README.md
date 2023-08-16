@@ -12,7 +12,7 @@ This code is divided into folders:
 1. `src`: source code files, main components for running the program, implementation of Monte Carlo algorithms as well as properties calculations and input/output routines;
 2. `scripts`: `python` files used for post-processing data, running multiple simulations on parallel and other routines;
 3. `data`: files used for simulating the data presented on the dissertation;
-4. `notebooks`: additional `jupyter-notebook` files used for analysing, post-processing the data and creating input files.
+4. `notebooks`: additional `jupyter-notebook` files used for analyzing, post-processing the data and creating input files.
 
 ## Code compilation and utilization
 The main program is written in `C` and requires an adequate compiler (such as `gcc`). It can be compiled with the `MakeFile` available inside `src` folder:
@@ -52,7 +52,7 @@ PERTURBED_POTENTIAL LENNARD_JONES
 
 Each field is described below:
 - `SIMULATION_ENSEMBLE` - ensemble for running the production steps, must be one of `NVT`, `muVT` or `NPT`;
-- `EQUILIBRATION_ENSEMBLE` - ensemble for running the equilibration steps, must be one of `NVT`, `muVT` or `NPT`. More specifically, if `EQUILIBRATION_ENSEMBLE` and `SIMULATION_ENSEMBLE` different than the first half the equilibration steps are run in the equilibration ensemble and the latter half on the simulation ensemble;
+- `EQUILIBRATION_ENSEMBLE` - ensemble for running the equilibration steps, must be one of `NVT`, `muVT` or `NPT`. More specifically, if `EQUILIBRATION_ENSEMBLE` and `SIMULATION_ENSEMBLE` different then the first half the equilibration steps are run in the equilibration ensemble and the latter half on the simulation ensemble;
 - `NUBMER_OF_MOLECULES` - number of molecules for the simulation, must be an integer. Fixed number for `NVT` or `NPT` simulations or initial number for `muVT`;
 - `CHAIN_SIZE` - integer specifying the size of the alkane chain;
 - `TEMPERATURE` - simulation temperature in Kelvin;
