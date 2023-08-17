@@ -50,9 +50,9 @@ example_3_summary.csv
 
 # combine_summaries.py
 
-This script consolidates the result of each `summary.csv` result into a single table. It is necessary to run it on the folder where the files are stores, it will combine any file which matches the pattern `*summary.csv`. It requires a name for the output file. Usage:
+This script consolidates the result of each `summary.csv` result into a single table. It is necessary to run it on the folder where the files are stores, it will combine any file which matches the pattern `*summary.csv`. It requires a name for the output file. The script requires an argument `--output_name` for naming the combined file. Usage:
 ```
-$ python path/to/combine_summaries.py
+$ python path/to/combine_summaries.py --output_name=<output_name>
 ```
 
 # get_profiles results.py
