@@ -220,7 +220,15 @@ def get_profiles(filename: str) -> None:
         number_molecules_profiles = get_number_molecules_profile_results(results_list, bin_centers)
         orietantion_profiles = get_orietantion_profile_results(results_list, bin_centers)
 
-        number_molecules_summary = get_profile_summary(number_molecules_profiles)
+        number_molecules_summary = (
+            get_profile_summary(number_molecules_profiles)
+            .merge(
+                pd.DataFrame({"Bin":bin_centers}),
+                on="Bin",
+                how="right"
+            )
+            .fillna(0)
+        )
 
         molar_density_summary = number_molecules_summary.copy()
         molar_density_summary['mean'] /= bin_volume * AVOGADRO_NUMBER
@@ -228,7 +236,15 @@ def get_profiles(filename: str) -> None:
         mass_density_summary = molar_density_summary.copy()
         mass_density_summary['mean'] *= molar_mass / 1000
 
-        orietantion_summary = get_profile_summary(orietantion_profiles)
+        orietantion_summary = (
+            get_profile_summary(orietantion_profiles)
+            .merge(
+                pd.DataFrame({"Bin":bin_centers}),
+                on="Bin",
+                how="right"
+            )
+            .fillna(0)
+        )
 
         number_molecules_summary.to_csv(base_name + 'number_molecules_profile.csv', index=False)
         molar_density_summary.to_csv(base_name + 'molar_density_profile.csv', index=False)
