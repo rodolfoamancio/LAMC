@@ -198,6 +198,12 @@ def get_profiles(filename: str) -> None:
                                 S = ("S", "mean"),
                                 number_molecules = ("z", "count")
                             )
+                            .merge(
+                                pd.DataFrame({"bin":bin_centers}),
+                                on="bin",
+                                how="right"
+                            )
+                            .fillna(0)
                             .assign(
                                 abs_bin = lambda df: (
                                     np.abs(df["bin"])
@@ -222,12 +228,12 @@ def get_profiles(filename: str) -> None:
 
         number_molecules_summary = (
             get_profile_summary(number_molecules_profiles)
-            .merge(
-                pd.DataFrame({"Bin":bin_centers}),
-                on="Bin",
-                how="right"
-            )
-            .fillna(0)
+            # .merge(
+            #     pd.DataFrame({"Bin":bin_centers}),
+            #     on="Bin",
+            #     how="right"
+            # )
+            # .fillna(0)
         )
 
         molar_density_summary = number_molecules_summary.copy()
@@ -238,12 +244,12 @@ def get_profiles(filename: str) -> None:
 
         orietantion_summary = (
             get_profile_summary(orietantion_profiles)
-            .merge(
-                pd.DataFrame({"Bin":bin_centers}),
-                on="Bin",
-                how="right"
-            )
-            .fillna(0)
+            # .merge(
+            #     pd.DataFrame({"Bin":bin_centers}),
+            #     on="Bin",
+            #     how="right"
+            # )
+            # .fillna(0)
         )
 
         number_molecules_summary.to_csv(base_name + 'number_molecules_profile.csv', index=False)
