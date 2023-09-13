@@ -12,7 +12,6 @@
 #include"simulation_setup.h"
 
 double  Temperature;
-double  SimulationTemperature;
 double  SimulationPressure;
 double  SimulationFugacity;
 double  Beta;

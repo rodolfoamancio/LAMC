@@ -87,7 +87,7 @@ void ReadInputFile(char inputsFilePath[]){
 
    }else if(strcmp(InputName, "TEMPERATURE")==0){
     sscanf(InputData, "%lf", &double_aux);
-    SimulationTemperature = double_aux;
+    Temperature = double_aux;
      
    }else if(strcmp(InputName, "BOX_X_SIZE")==0){
     sscanf(InputData, "%lf", &double_aux);

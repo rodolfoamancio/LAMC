@@ -52,7 +52,6 @@ void RunSimulation(char* InputFileName){
   // Input file data
   ReadInputFile(InputFileName);
 
-  Temperature = SimulationTemperature;
   Beta = 1/(BOLTZMANN_CONSTANT*Temperature);
   SimulationBox.volume = SimulationBox.xSize*SimulationBox.ySize*SimulationBox.zSize;
   Ensemble = EquilibraionEnsemble;
@@ -94,7 +93,7 @@ void RunSimulation(char* InputFileName){
     "Z size.....................................: %f \n"
     "------------------------------------------------------------------------------------------------------\n\n",
     GetPotentialTypeLabel(ReferencePotential), GetPotentialTypeLabel(PerturbationPotential), GetEnsembleLabel(EquilibraionEnsemble),
-    GetEnsembleLabel(SimulationEnsemble), SimulationTemperature, NumberTotalCycles, NumberEquilibrationCycles, NumberTotalSteps,
+    GetEnsembleLabel(SimulationEnsemble), Temperature, NumberTotalCycles, NumberEquilibrationCycles, NumberTotalSteps,
     NumberEquilibrationSteps, DisplacementAcceptanceTarget, CyclesCalculateProperties, CyclesRecordConfiguration, 
     CyclesGetProfiles, StepsCalculateProperties, StepsRecordConfiguration, StepsGetProfiles, SimulationBox.ClosedBox ? "Closed" : "Open",
     DisplacementAttemptProbability, InsertionAttemptProbability, DeletionAttemptProbability, InitialNumberMolecules, ChainSize,
