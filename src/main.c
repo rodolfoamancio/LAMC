@@ -33,7 +33,7 @@ void RunSimulation(char* InputFileName){
   double WeightIdealChainSample, WeightIdealChainSquared, STDWeightIdealChain;  
   int CountMovements = 0;
   int ProductionFlag = 0;
-  int OptimizeAcceptanceEverySteps, OptimizeAcceptanceEveryCycles;
+  int OptimizeAcceptanceEverySteps;
   CONFIGURATION OldConfiguration, NewConfiguration;
 
   // Variables initialization
@@ -56,7 +56,7 @@ void RunSimulation(char* InputFileName){
   Beta = 1/(BOLTZMANN_CONSTANT*Temperature);
   SimulationBox.volume = SimulationBox.xSize*SimulationBox.ySize*SimulationBox.zSize;
   Ensemble = EquilibraionEnsemble;
-  OptimizeAcceptanceEverySteps = (int) OptimizeAcceptanceEveryCycles*InitialNumberMolecules;
+  OptimizeAcceptanceEverySteps = (int) InitialNumberMolecules;
   NumberTotalSteps = (int) NumberTotalCycles*InitialNumberMolecules;
   NumberEquilibrationSteps = (int) NumberEquilibrationCycles*InitialNumberMolecules;
   StepsCalculateProperties = (int) CyclesCalculateProperties*InitialNumberMolecules;
