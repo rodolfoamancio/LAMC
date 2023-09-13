@@ -24,7 +24,6 @@
 #include"simulation_setup.h"
 
 #define NUMBER_TRIAL_ORIENTATIONS 30
-#define NUMBER_TRIAL_CAVITY_SEARCH 20
 
 enum ensemble {NVT, NPT, muVT};
 extern enum ensemble SimulationEnsemble;
