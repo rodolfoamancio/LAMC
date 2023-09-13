@@ -107,16 +107,6 @@ void ReadInputFile(char inputsFilePath[]){
     SimulationBox.zMin = -double_aux/2;
     SimulationBox.zMax = double_aux/2;
 
-   }else if(strcmp(InputName, "NUMBER_TOTAL_STEPS")==0){
-    sscanf(InputData, "%lf", &double_aux);
-    int_aux = (int) double_aux;
-    NumberTotalSteps = int_aux;
-     
-   }else if(strcmp(InputName, "NUMBER_EQUILIBRATION_STEPS")==0){
-    sscanf(InputData, "%lf", &double_aux);
-    int_aux = (int) double_aux;
-    NumberEquilibrationSteps = int_aux;
-
    }else if(strcmp(InputName, "ACCEPTANCE_RATIO")==0){
     sscanf(InputData, "%lf", &double_aux);
     DisplacementAcceptanceTarget = double_aux;
