@@ -235,8 +235,8 @@ void RunSimulation(char* InputFileName){
     // adjust maximum displacement according to the acceptance ratio
     DisplacementAcceptanceCalculated = (double) DisplacementStepsAccepted/DisplacementStepsAttempted;
     if(i%OptimizeAcceptanceEverySteps==0 && i<NumberEquilibrationSteps){
-      MaxTranslationDistance *= LimMinMax(DisplacementAcceptanceCalculated/DisplacementAcceptanceTarget, 0.3, 1.7);
-      MaxTranslationDistance = LimMinMax(MaxTranslationDistance, 0.05, 10.0);
+      MaxTranslationDistance *= LimMinMax(DisplacementAcceptanceCalculated/DisplacementAcceptanceTarget, 0.2, 1.8);
+      MaxTranslationDistance = LimMinMax(MaxTranslationDistance, 0.01, 20.0);
     }
 
     // adjust maximum volume change according to the acceptance ratio
