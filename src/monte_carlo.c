@@ -291,15 +291,15 @@ void GenerateInitialConfiguration(CONFIGURATION* Configuration){
   double xStart, xEnd, yStart, yEnd, zStart, zEnd;
   int SelectedTrialOrientation;
 
-  CellLength = cbrt((SimulationBox.xSize*0.9)*(SimulationBox.ySize*0.9)*(SimulationBox.zSize*0.9)/Configuration->NumberMolecules);
+  CellLength = cbrt((SimulationBox.xSize*0.8)*(SimulationBox.ySize*0.8)*(SimulationBox.zSize*0.7)/Configuration->NumberMolecules);
 
-  xStart = SimulationBox.xMin + 0.05*SimulationBox.xSize;
-  yStart = SimulationBox.yMin + 0.05*SimulationBox.ySize;
-  zStart = SimulationBox.zMin + 0.05*SimulationBox.zSize;
+  xStart = SimulationBox.xMin + 0.1*SimulationBox.xSize;
+  yStart = SimulationBox.yMin + 0.1*SimulationBox.ySize;
+  zStart = SimulationBox.zMin + 0.15*SimulationBox.zSize;
 
-  xEnd = SimulationBox.xMax - 0.05*SimulationBox.xSize;
-  yEnd = SimulationBox.yMax - 0.05*SimulationBox.ySize;
-  zEnd = SimulationBox.zMax - 0.05*SimulationBox.zSize;
+  xEnd = SimulationBox.xMax - 0.1*SimulationBox.xSize;
+  yEnd = SimulationBox.yMax - 0.1*SimulationBox.ySize;
+  zEnd = SimulationBox.zMax - 0.15*SimulationBox.zSize;
 
   BasePosition.x = xStart;
   BasePosition.y = yStart;
