@@ -140,6 +140,9 @@ void RunSimulation(char* InputFileName){
   AveragePotential=AveragePotentialBonded=AveragePotentialNonbonded=AveragePotentialLongRangeCorrection=AveragePotentialWalls=0;
   AverageNumberMolecules=AverageDensityMass=AverageDensityMolar=0;
 
+  DensityMass = GetDensityMass(OldConfiguration);
+  DensityMolar = GetDensityMolar(OldConfiguration);
+
   printf("\n-------------------------------------------Simulation starting----------------------------------------\n\n");
   
   // --------------------------------------------------------------------------------------------------------------
