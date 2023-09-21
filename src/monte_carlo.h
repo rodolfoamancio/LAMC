@@ -39,7 +39,7 @@ void CopyConfiguration(CONFIGURATION Source, CONFIGURATION* Dest);
 void InitializeConfiguration(CONFIGURATION* Configuration);
 
 // Initialaization function
-void GenerateInitialConfiguration(CONFIGURATION* Configuration);
+double GenerateInitialConfiguration(CONFIGURATION* Configuration);
 
 // Supplementary function
 double GetRosenbluthWeightIdealChain(MOLECULE Molecule);
