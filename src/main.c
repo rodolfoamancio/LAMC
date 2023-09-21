@@ -24,13 +24,14 @@
 #include"files_io.h"
 #include"simulation_setup.h"
 
-void RunSimulation(char* InputFileName){
+double RunSimulation(char* InputFileName){
   FILE *PropertiesDataFile, *ConfigurationsFile, *ProfileFile;
   double PressureExcess, PressureTotal, PressureLongRangeCorrection, PressureIdealGas;
   double PotentialNonbonded, PotentialBonded, PotentialWalls, PotentialLongRangeCorrection, PotentialTotal, PotentialPerturbed;
   double WeightGhostMolecule;
   double DensityMolar, DensityMass;
   double WeightIdealChainSample, WeightIdealChainSquared, STDWeightIdealChain;  
+  double CellLength;
   int CountMovements = 0;
   int ProductionFlag = 0;
   int OptimizeAcceptanceEverySteps;
@@ -122,10 +123,12 @@ void RunSimulation(char* InputFileName){
   );
 
   printf("\n----------------------------------------Generating initial configuration------------------------------\n\n");
-  GenerateInitialConfiguration(&OldConfiguration);
-  
+  CellLength = GenerateInitialConfiguration(&OldConfiguration);
   printf("Initial configuration generated\n");
-
+  if(ReferencePotential == HARD_SPHERE && CellLength <= SigmaAlkane[2]){
+    printf("Cell length (%.2f) is to small for Hard-sphere simulation. Reduce system density!. Simulation aborted!", CellLength);
+    return -1;
+  }
   // Initialize output files
   PropertiesDataFile = InitializePropertiesDataFile(InputFileName);
   ConfigurationsFile = InitializeConfigurationFile(InputFileName);
@@ -256,11 +259,12 @@ void RunSimulation(char* InputFileName){
   fclose(PropertiesDataFile);
 
   printf("\n-----------------------------------------Simulation has finished--------------------------------------\n\n");
+  return 0;
 }
 
 int main(int argc, char *argv[]){
-  
-  RunSimulation(argv[1]);
+  double value;
+  value = RunSimulation(argv[1]);
 
-  return 0;
+  return value;
 }
