@@ -278,7 +278,7 @@ double GetRosenbluthWeightGhostMolecule(CONFIGURATION Configuration){
  *              number of molecules and chain size already filled
  * Returns    | None
  * **************************************************************************************************************/
-void GenerateInitialConfiguration(CONFIGURATION* Configuration){
+double GenerateInitialConfiguration(CONFIGURATION* Configuration){
   CONFIGURATION AuxConfiguration;
   POTENTIAL PartialPotential[MAX_CHAIN_SIZE][NUMBER_TRIAL_ORIENTATIONS];
   VECTOR PositionTrialOrientations[MAX_CHAIN_SIZE][NUMBER_TRIAL_ORIENTATIONS];
@@ -288,18 +288,23 @@ void GenerateInitialConfiguration(CONFIGURATION* Configuration){
   double WeightBeadTotal[MAX_CHAIN_SIZE]={0};
   double CellLength;
   double BondLength;
+  double xSize, ySize, zSize;
   double xStart, xEnd, yStart, yEnd, zStart, zEnd;
   int SelectedTrialOrientation;
 
-  CellLength = cbrt((SimulationBox.xSize*0.7)*(SimulationBox.ySize*0.7)*(SimulationBox.zSize*0.7)/Configuration->NumberMolecules);
+  xSize = SimulationBox.xSize - SigmaAlkane[2];
+  ySize = SimulationBox.ySize - SigmaAlkane[2];
+  zSize = SimulationBox.zSize - SigmaAlkane[2];
 
-  xStart = SimulationBox.xMin + 0.15*SimulationBox.xSize;
-  yStart = SimulationBox.yMin + 0.15*SimulationBox.ySize;
-  zStart = SimulationBox.zMin + 0.15*SimulationBox.zSize;
+  CellLength = cbrt(xSize*ySize*zSize/Configuration->NumberMolecules);
 
-  xEnd = SimulationBox.xMax - 0.15*SimulationBox.xSize;
-  yEnd = SimulationBox.yMax - 0.15*SimulationBox.ySize;
-  zEnd = SimulationBox.zMax - 0.15*SimulationBox.zSize;
+  xStart = SimulationBox.xMin;
+  yStart = SimulationBox.yMin;
+  zStart = SimulationBox.zMin + SigmaAlkane[2]/2;
+
+  xEnd = SimulationBox.xMax - SigmaAlkane[2];
+  yEnd = SimulationBox.yMax - SigmaAlkane[2];
+  zEnd = SimulationBox.zMax - SigmaAlkane[2]/2;
 
   BasePosition.x = xStart;
   BasePosition.y = yStart;
@@ -342,6 +347,7 @@ void GenerateInitialConfiguration(CONFIGURATION* Configuration){
     }
   }
   CopyConfiguration(AuxConfiguration, Configuration);
+  return CellLength;
 }
 
 /* ***************************************************************************************************************
