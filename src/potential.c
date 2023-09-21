@@ -175,7 +175,6 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
   PartialPotential.potential = 0.0;
 
   PartialPotential = GetPotentialExternalField(Configuration.Molecules[referenceMolecule].Atoms[referenceParticle]);
-  
   if(PartialPotential.overlap) return PartialPotential;
 
   for(int i=0; i<Configuration.NumberMolecules; i++){
@@ -227,29 +226,29 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
  * Returns    | The calculated external potential.
  * **************************************************************************************************************/
 POTENTIAL GetPotentialExternalField(ATOM Atom) {
-  POTENTIAL AuxPotentialExternalField;
+  POTENTIAL potentialField;
+  potentialField.potential = 0.0;
+  potentialField.overlap = false;
 
   if (SimulationBox.ClosedBox) {
     double z = Atom.Position.z;
     
-    if(z<=SimulationBox.zMin || z>=SimulationBox.zMax){
-      AuxPotentialExternalField.overlap = true;
-      AuxPotentialExternalField.potential = 1E5;
-    }else{
-      double distanceLowerWall = z - SimulationBox.zMin;
-      double distanceUpperWall = SimulationBox.zMax - z;
-      double potentialLowerWall = GetPotentialSteele(Atom, distanceLowerWall);
-      double potentialUpperWall = GetPotentialSteele(Atom, distanceUpperWall);
-
-      AuxPotentialExternalField.potential = potentialLowerWall + potentialUpperWall;
-      AuxPotentialExternalField.overlap = (Beta * AuxPotentialExternalField.potential > 1000);
+    if (z <= SimulationBox.zMin || z >= SimulationBox.zMax){
+      potentialField.overlap = true;
+      potentialField.potential = 1E5;
+      return potentialField;
     }
-  }else{
-    AuxPotentialExternalField.potential = 0.0;
-    AuxPotentialExternalField.overlap = false;
-  }
 
-  return AuxPotentialExternalField;
+    double distanceLowerWall = z - SimulationBox.zMin;
+    double distanceUpperWall = SimulationBox.zMax - z;
+    double potentialLowerWall = GetPotentialSteele(Atom, distanceLowerWall);
+    double potentialUpperWall = GetPotentialSteele(Atom, distanceUpperWall);
+
+    potentialField.potential = potentialLowerWall + potentialUpperWall;
+    potentialField.overlap = (Beta * potentialField.potential > 1000);
+  }
+  
+  return potentialField;
 }
 
 /* ***************************************************************************************************************
@@ -343,27 +342,29 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
   double sigma, epsilon;
   int i, j, k, l, k0, l0;
 
-  if (Potential == LENNARD_JONES) {
-    for (i = 0; i < Configuration.NumberMolecules; i++) {
-      for (j = 0; j < Configuration.Molecules[i].Size; j++) {
-        k0 = j < Configuration.Molecules[i].Size - 4 ? i : i + 1;
-        for (k = k0; k < Configuration.NumberMolecules; k++) {
-          l0 = k == i ? j + 4 : 0;
-          for (l = l0; l < Configuration.Molecules[k].Size; l++) {
-            SeparationVector = VectorSubtraction(
-              Configuration.Molecules[i].Atoms[j].Position, 
-              Configuration.Molecules[k].Atoms[l].Position
-            );
-            SeparationVector = ApplyPeriodicBoundaryConditionsVector(SeparationVector);
-            DistanceSquared = NormSquared(SeparationVector);
-            if (DistanceSquared < CUTOFF_SQUARED) {
-              sigma = GetSigma(Configuration.Molecules[i].Atoms[j].Sigma, Configuration.Molecules[k].Atoms[l].Sigma);
-              epsilon = GetEpsilon(Configuration.Molecules[i].Atoms[j].Epsilon, Configuration.Molecules[k].Atoms[l].Epsilon);
-              SigmaOverDistance6 = pow(sigma, 6)/Cube(DistanceSquared);
-              SigmaOverDistance12 = SigmaOverDistance6 * SigmaOverDistance6;
-              potential = 4 * epsilon * (SigmaOverDistance12 - SigmaOverDistance6);
-              Sum += potential;
-            }
+  for (i = 0; i < Configuration.NumberMolecules; i++) {
+    for (j = 0; j < Configuration.Molecules[i].Size; j++) {
+      k0 = j < Configuration.Molecules[i].Size - 4 ? i : i + 1;
+      for (k = k0; k < Configuration.NumberMolecules; k++) {
+        l0 = k == i ? j + 4 : 0;
+        for (l = l0; l < Configuration.Molecules[k].Size; l++) {
+          SeparationVector = VectorSubtraction(
+            Configuration.Molecules[i].Atoms[j].Position, 
+            Configuration.Molecules[k].Atoms[l].Position
+          );
+          SeparationVector = ApplyPeriodicBoundaryConditionsVector(SeparationVector);
+          DistanceSquared = NormSquared(SeparationVector);
+          sigma = GetSigma(Configuration.Molecules[i].Atoms[j].Sigma, Configuration.Molecules[k].Atoms[l].Sigma);
+
+          if (Potential == LENNARD_JONES && DistanceSquared < CUTOFF_SQUARED){
+            epsilon = GetEpsilon(Configuration.Molecules[i].Atoms[j].Epsilon, Configuration.Molecules[k].Atoms[l].Epsilon);
+            SigmaOverDistance6 = pow(sigma, 6)/Cube(DistanceSquared);
+            SigmaOverDistance12 = SigmaOverDistance6 * SigmaOverDistance6;
+            potential = 4 * epsilon * (SigmaOverDistance12 - SigmaOverDistance6);
+            Sum += potential;
+            if(Beta*potential > 1000) return 1E6;
+          }else if (Potential == HARD_SPHERE && DistanceSquared < Squared(sigma)){
+            return 1E6;
           }
         }
       }
