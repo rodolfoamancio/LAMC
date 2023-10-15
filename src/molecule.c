@@ -120,6 +120,29 @@ double GetAlkaneRepulsiveExponent(enum CarbonType Type){
 }
 
 /* ***************************************************************************************************************
+ * Name       | GetAlkaneAttractiveExponent
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Retrieves the attractive exponent value based on the given CarbonType.
+ * Parameters | - Type: The CarbonType enum representing the type of alkane pseudoatom.
+ * Returns    | The attractive exponent value for the specified alkane type.
+ * **************************************************************************************************************/
+double GetAlkaneAttractiveExponent(enum CarbonType Type){
+  double exponent = 12;
+  switch (Type){
+  case CH4:
+    exponent = AttractiveExponentAlkane[0];
+    break;
+  case CH3:
+    exponent = AttractiveExponentAlkane[1];
+    break;
+  case CH2:
+    exponent = AttractiveExponentAlkane[1];
+    break;
+  }
+  return exponent;
+}
+
+/* ***************************************************************************************************************
  * Name       | GetAlkaneAtomMolarMass
  * ---------------------------------------------------------------------------------------------------------------
  * Function   | Retrieves the molar mass of the alkane atom based on the given CarbonType.

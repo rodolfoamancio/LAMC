@@ -112,6 +112,7 @@ double GetExponentCombination(double ExponentA, double ExponentB);
 
 // Functions for configuring molecules
 double GetAlkaneRepulsiveExponent(enum CarbonType Type);
+double GetAlkaneAttractiveExponent(enum CarbonType Type);
 double GetAlkaneEpsilon(enum CarbonType Type);
 double GetAlkaneSigma(enum CarbonType Type);
 double GetAlkaneAtomMolarMass(enum CarbonType Type);
