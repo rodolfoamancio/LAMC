@@ -28,6 +28,13 @@ typedef struct{
 enum PotentialType {LENNARD_JONES, HARD_SPHERE};
 extern enum PotentialType ReferencePotential, PerturbationPotential;
 
+double GetCMie(double RepulsiveExponent, double AttractiveExponent);
+double GetPotentialMie(
+  double RepulsiveExponent, 
+  double AttractiveExponent, 
+  double Sigma, 
+  double Epsilon, 
+  double Distance);
 double GetPotentialStreaching(double d);
 double GetPotentialBending(double theta);
 double GetPotentialTorsion(double phi);

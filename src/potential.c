@@ -13,6 +13,52 @@
 enum PotentialType ReferencePotential, PerturbationPotential;
 
 /* ***************************************************************************************************************
+ * Name       | GetCMie
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Calculates C pre-factor of the Mie potential
+ * Parameters | 
+ *              - RepulsiveExponent: The exponent for the repulsive part
+ *              - AttractiveExponent: The exponent for the repulsive part
+ * Returns    | The value of C
+ * **************************************************************************************************************/
+double GetCMie(double RepulsiveExponent, double AttractiveExponent){
+  double C;
+  C = (
+    (RepulsiveExponent/(RepulsiveExponent - AttractiveExponent))
+    *pow(RepulsiveExponent/AttractiveExponent, AttractiveExponent/(RepulsiveExponent - AttractiveExponent))
+  );
+  return C;
+}
+
+/* ***************************************************************************************************************
+ * Name       | GetPotentialMie
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Calculates the Mie potential
+ * Parameters | 
+ *              - RepulsiveExponent: The exponent for the repulsive part
+ *              - AttractiveExponent: The exponent for the repulsive part
+ *              - Sigma: The segment diameter in A
+ *              - Epsilon: the potential depth in J
+ *              - Distance: the distance in A
+ * Returns    | The potential energy in atomic units.
+ * **************************************************************************************************************/
+double GetPotentialMie(
+  double RepulsiveExponent, 
+  double AttractiveExponent, 
+  double Sigma, 
+  double Epsilon, 
+  double Distance){
+    double C;
+    double SigmaDistance, SigmaDistanceN, SigmaDistanceM;
+    C = GetCMie(RepulsiveExponent, AttractiveExponent);
+    SigmaDistance = Sigma/Distance;
+    SigmaDistanceN = pow(SigmaDistance, RepulsiveExponent);
+    SigmaDistanceM = pow(SigmaDistance, AttractiveExponent);
+    return C*Epsilon*(SigmaDistanceN - SigmaDistanceM);
+}
+
+
+/* ***************************************************************************************************************
  * Name       | GetPotentialStretching
  * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates the potential energy due to stretching.
@@ -164,11 +210,9 @@ VECTOR SampleBendingTorsionAngles(VECTOR r1, VECTOR r2, VECTOR r3){
 POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int referenceMolecule, int referenceParticle){
   POTENTIAL PartialPotential;
   VECTOR SeparationVector;
-  double sigma, epsilon;
-  double DistanceSquared;
+  double sigma, epsilon, RepulsiveExponent, AttractiveExponent;
+  double Distance;
   double potential;
-  double SigmaOverDistance6;
-  double SigmaOverDistance12;
   bool ExcludedInterations;
 
   PartialPotential.overlap = false;
@@ -186,24 +230,32 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
           Configuration.Molecules[i].Atoms[j].Position
         );
         SeparationVector = ApplyPeriodicBoundaryConditionsVector(SeparationVector);
-        DistanceSquared  = NormSquared(SeparationVector);
+        Distance = Norm(SeparationVector);
         sigma = GetSigma(
           Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].Sigma, 
           Configuration.Molecules[i].Atoms[j].Sigma
         );
 
-        if(ReferencePotential == HARD_SPHERE && DistanceSquared < Squared(sigma)){
+        if(ReferencePotential == HARD_SPHERE && Distance < sigma){
           PartialPotential.overlap = true;
           PartialPotential.potential = 1E30;
           return PartialPotential;
-        }else if(ReferencePotential == LENNARD_JONES && DistanceSquared < CUTOFF_SQUARED){
+        }else if(ReferencePotential == LENNARD_JONES && Distance < CUTOFF_DISTANCE){
           epsilon = GetEpsilon(
               Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].Epsilon, 
               Configuration.Molecules[i].Atoms[j].Epsilon
           );
-          SigmaOverDistance6  = pow(sigma, 6)/Cube(DistanceSquared);
-          SigmaOverDistance12 = Squared(SigmaOverDistance6);
-          potential = 4.0*epsilon*(SigmaOverDistance12 - SigmaOverDistance6);
+          RepulsiveExponent = GetInteractionExponent(
+            Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].RepulsiveExponent, 
+            Configuration.Molecules[i].Atoms[j].RepulsiveExponent
+          );
+          potential = GetPotentialMie(
+            RepulsiveExponent,
+            6,
+            sigma,
+            epsilon,
+            Distance
+          );
           if(Beta*potential > 10){
             PartialPotential.overlap = true;
             PartialPotential.potential = 1E30;
