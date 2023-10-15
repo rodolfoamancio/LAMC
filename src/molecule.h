@@ -79,6 +79,7 @@ typedef struct{
     double Sigma;
     double Epsilon;
     double RepulsiveExponent;
+    double AttractiveExponent;
     double MolarMass;
 } ATOM;
 
