@@ -52,22 +52,36 @@ double GetPressureLongRangeCorrection(CONFIGURATION Configuration){
   for(int i = 0; i < NUMBER_PSEUDO_ATOMS_TYPES; i++){
     AtomA.Epsilon  = EpsilonAlkane[i];
     AtomA.Sigma    = SigmaAlkane[i];
+    AtomA.RepulsiveExponent = RepulsiveExponentAlkane[i];
+    AtomA.AttractiveExponent = 6;
     for(int j = 0; j < NUMBER_PSEUDO_ATOMS_TYPES; j++){
       AtomB.Epsilon  = EpsilonAlkane[j];
       AtomB.Sigma    = SigmaAlkane[j];
+      AtomB.RepulsiveExponent = RepulsiveExponentAlkane[j];
+      AtomB.AttractiveExponent = 6;
       double Epsilon = GetEpsilon(AtomA.Epsilon, AtomB.Epsilon);
       double Sigma   = GetSigma(AtomA.Sigma, AtomB.Sigma);
-
+      double RepulsiveExponent = GetInteractionExponent(AtomA.RepulsiveExponent, AtomB.RepulsiveExponent);
+      double AttractiveExponent = GetInteractionExponent(AtomA.AttractiveExponent, AtomB.AttractiveExponent);
+      double C = GetCMie(RepulsiveExponent, AttractiveExponent);
       double SigmaOverCutoff = Sigma/CUTOFF_DISTANCE;
-      double SigmaOverCutoff3 = Cube(SigmaOverCutoff);
-      double SigmaOverCutoff9 = Cube(SigmaOverCutoff3);
+      double SigmaOverCutoffN = pow(SigmaOverCutoff, RepulsiveExponent);
+      double SigmaOverCutoffM = pow(SigmaOverCutoff, AttractiveExponent);
 
-      AuxInteractions += (NumberPesudoAtoms[i]*NumberPesudoAtoms[j]*Epsilon*Cube(Sigma*ANGSTRON)*\
-        ((2./3.)*SigmaOverCutoff9-SigmaOverCutoff3));
+      AuxInteractions += (
+        NumberPesudoAtoms[i]
+        *NumberPesudoAtoms[j]
+        *C
+        *Epsilon
+        *(
+          (AttractiveExponent/(3-AttractiveExponent))*SigmaOverCutoffM
+          -(RepulsiveExponent/(3-RepulsiveExponent))*SigmaOverCutoffN
+        )
+      );
     }
   }
 
-  return 16.*M_PI*AuxInteractions/(3.*Squared(VolumeCubicMeters));
+  return 2.0*M_PI*AuxInteractions*Cube(CUTOFF_DISTANCE)/(3.*Squared(VolumeCubicMeters));
 }
 
 /* ***************************************************************************************************************
