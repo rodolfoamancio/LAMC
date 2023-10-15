@@ -38,6 +38,19 @@ double GetEpsilon(double EpsilonA, double EpsilonB){
 }
 
 /* ***************************************************************************************************************
+ * Name       | GetInteractionExponent
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Applies the combination rule from Lafitte (2013) for the exponents of the Mie potential
+ * Parameters |
+ *              - ExponentA: The first exponent value.
+ *              - ExponentA: The second exponent value.
+ * Returns    | The combination exponent
+ * **************************************************************************************************************/
+double GetInteractionExponent(double ExponentA, double ExponentB){
+  return (ExponentA != ExponentB) ? sqrt((ExponentA - 3)*(ExponentB - 3)) + 3 : ExponentA;
+}
+
+/* ***************************************************************************************************************
  * Name       | GetAlkaneEpsilon
  * ---------------------------------------------------------------------------------------------------------------
  * Function   | Retrieves the epsilon value based on the given CarbonType.
@@ -81,6 +94,29 @@ double GetAlkaneSigma(enum CarbonType Type){
 
   }
   return Sigma;
+}
+
+/* ***************************************************************************************************************
+ * Name       | GetAlkaneRepulsiveExponent
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Retrieves the repulsive exponent value based on the given CarbonType.
+ * Parameters | - Type: The CarbonType enum representing the type of alkane pseudoatom.
+ * Returns    | The repulsive exponent value for the specified alkane type.
+ * **************************************************************************************************************/
+double GetAlkaneRepulsiveExponent(enum CarbonType Type){
+  double exponent = 12;
+  switch (Type){
+  case CH4:
+    exponent = RepulsiveExponentAlkane[0];
+    break;
+  case CH3:
+    exponent = RepulsiveExponentAlkane[1];
+    break;
+  case CH2:
+    exponent = RepulsiveExponentAlkane[1];
+    break;
+  }
+  return exponent;
 }
 
 /* ***************************************************************************************************************
