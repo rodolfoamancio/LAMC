@@ -34,14 +34,19 @@
 // Lennard-Jones parameters for intermolecular interatcions
 static const double SigmaAlkane[3] = {
     3.73, 
-    3.75, 
-    3.95
+    3.6034, 
+    4.0400
 }; // in A
 static const double EpsilonAlkane[3] = {
     148*BOLTZMANN_CONSTANT, 
-    98*BOLTZMANN_CONSTANT, 
-    46*BOLTZMANN_CONSTANT
+    136.318*BOLTZMANN_CONSTANT, 
+    52.9133*BOLTZMANN_CONSTANT
 }; // in J
+static const double RepulsiveExponentAlkane[3] = {
+    12,
+    14,
+    14
+};
 static const double PseudoAtomMolarMass[3] = {
     16.04206, 
     15.03422, 
@@ -73,6 +78,7 @@ typedef struct{
     VECTOR Force;
     double Sigma;
     double Epsilon;
+    double RepulsiveExponent;
     double MolarMass;
 } ATOM;
 
