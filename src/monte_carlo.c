@@ -42,6 +42,8 @@ void InitializeConfiguration(CONFIGURATION* Configuration){
     Configuration->Molecules[0].Atoms[j].Epsilon = GetAlkaneEpsilon(Configuration->Molecules[0].Atoms[j].Type);
     Configuration->Molecules[0].Atoms[j].Sigma = GetAlkaneSigma(Configuration->Molecules[0].Atoms[j].Type);
     Configuration->Molecules[0].Atoms[j].MolarMass = GetAlkaneAtomMolarMass(Configuration->Molecules[0].Atoms[j].Type);
+    Configuration->Molecules[0].Atoms[j].AttractiveExponent = GetAlkaneAttractiveExponent(Configuration->Molecules[0].Atoms[j].Type);
+    Configuration->Molecules[0].Atoms[j].RepulsiveExponent = GetAlkaneRepulsiveExponent(Configuration->Molecules[0].Atoms[j].Type);
     Configuration->Molecules[0].MolarMass += Configuration->Molecules[0].Atoms[j].MolarMass;
   }
 
