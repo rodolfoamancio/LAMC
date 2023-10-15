@@ -12,7 +12,7 @@
 #include"molecule.h"
 
 /* ***************************************************************************************************************
- * Name       | GetSigma
+ * Name       | GetSigmaCombination
  * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates the average of two given sigma values.
  * Parameters |
@@ -20,12 +20,12 @@
  *              - SigmaB: The second sigma value.
  * Returns    | The average of SigmaA and SigmaB.
  * **************************************************************************************************************/
-double GetSigma(double SigmaA, double SigmaB){
+double GetSigmaCombination(double SigmaA, double SigmaB){
   return (SigmaA != SigmaB) ? (SigmaA + SigmaB)/2 : SigmaA;
 }
 
 /* ***************************************************************************************************************
- * Name       | GetEpsilon
+ * Name       | GetEpsilonCombination
  * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates the square root of the product of two given epsilon values.
  * Parameters |
@@ -33,12 +33,12 @@ double GetSigma(double SigmaA, double SigmaB){
  *              - EpsilonB: The second epsilon value.
  * Returns    | The square root of the product of EpsilonA and EpsilonB.
  * **************************************************************************************************************/
-double GetEpsilon(double EpsilonA, double EpsilonB){
+double GetEpsilonCombination(double EpsilonA, double EpsilonB){
   return (EpsilonA != EpsilonB) ? sqrt(EpsilonA*EpsilonB) : EpsilonA;
 }
 
 /* ***************************************************************************************************************
- * Name       | GetInteractionExponent
+ * Name       | GetExponentCombination
  * ---------------------------------------------------------------------------------------------------------------
  * Function   | Applies the combination rule from Lafitte (2013) for the exponents of the Mie potential
  * Parameters |
@@ -46,7 +46,7 @@ double GetEpsilon(double EpsilonA, double EpsilonB){
  *              - ExponentA: The second exponent value.
  * Returns    | The combination exponent
  * **************************************************************************************************************/
-double GetInteractionExponent(double ExponentA, double ExponentB){
+double GetExponentCombination(double ExponentA, double ExponentB){
   return (ExponentA != ExponentB) ? sqrt((ExponentA - 3)*(ExponentB - 3)) + 3 : ExponentA;
 }
 

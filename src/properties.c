@@ -51,10 +51,10 @@ double GetPressureLongRangeCorrection(CONFIGURATION Configuration){
 
   for(int i = 0; i < NUMBER_PSEUDO_ATOMS_TYPES; i++){
     for(int j = 0; j < NUMBER_PSEUDO_ATOMS_TYPES; j++){
-      double Sigma = GetSigma(SigmaAlkane[i], SigmaAlkane[j]);
-      double Epsilon = GetEpsilon(EpsilonAlkane[i], EpsilonAlkane[j]);
-      double RepulsiveExponent = GetInteractionExponent(RepulsiveExponentAlkane[i], RepulsiveExponentAlkane[j]);
-      double AttractiveExponent = GetInteractionExponent(AttractiveExponentAlkane[i], AttractiveExponentAlkane[j]);
+      double Sigma = GetSigmaCombination(SigmaAlkane[i], SigmaAlkane[j]);
+      double Epsilon = GetEpsilonCombination(EpsilonAlkane[i], EpsilonAlkane[j]);
+      double RepulsiveExponent = GetExponentCombination(RepulsiveExponentAlkane[i], RepulsiveExponentAlkane[j]);
+      double AttractiveExponent = GetExponentCombination(AttractiveExponentAlkane[i], AttractiveExponentAlkane[j]);
       double C = GetCMie(RepulsiveExponent, AttractiveExponent);
       double SigmaOverCutoff = Sigma/CUTOFF_DISTANCE;
       double SigmaOverCutoffN = pow(SigmaOverCutoff, RepulsiveExponent);

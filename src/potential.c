@@ -231,7 +231,7 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
         );
         SeparationVector = ApplyPeriodicBoundaryConditionsVector(SeparationVector);
         Distance = Norm(SeparationVector);
-        sigma = GetSigma(
+        sigma = GetSigmaCombination(
           Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].Sigma, 
           Configuration.Molecules[i].Atoms[j].Sigma
         );
@@ -241,15 +241,15 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
           PartialPotential.potential = 1E30;
           return PartialPotential;
         }else if(ReferencePotential == LENNARD_JONES && Distance < CUTOFF_DISTANCE){
-          epsilon = GetEpsilon(
+          epsilon = GetEpsilonCombination(
               Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].Epsilon, 
               Configuration.Molecules[i].Atoms[j].Epsilon
           );
-          RepulsiveExponent = GetInteractionExponent(
+          RepulsiveExponent = GetExponentCombination(
             Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].RepulsiveExponent, 
             Configuration.Molecules[i].Atoms[j].RepulsiveExponent
           );
-          AttractiveExponent = GetInteractionExponent(
+          AttractiveExponent = GetExponentCombination(
             Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].AttractiveExponent, 
             Configuration.Molecules[i].Atoms[j].AttractiveExponent
           );
@@ -325,10 +325,10 @@ VECTOR GetPotentialGradient(VECTOR SeparationVector, ATOM AtomA, ATOM AtomB) {
   Distance = Norm(SeparationVector);
 
   if (Distance < CUTOFF_DISTANCE) {
-    Sigma = GetSigma(AtomA.Sigma, AtomB.Sigma);
-    Epsilon = GetEpsilon(AtomA.Epsilon, AtomB.Epsilon);
-    AttractiveExponent = GetInteractionExponent(AtomA.AttractiveExponent, AtomB.AttractiveExponent);
-    RepulsiveExponent = GetInteractionExponent(AtomA.RepulsiveExponent, AtomB.RepulsiveExponent);
+    Sigma = GetSigmaCombination(AtomA.Sigma, AtomB.Sigma);
+    Epsilon = GetEpsilonCombination(AtomA.Epsilon, AtomB.Epsilon);
+    AttractiveExponent = GetExponentCombination(AtomA.AttractiveExponent, AtomB.AttractiveExponent);
+    RepulsiveExponent = GetExponentCombination(AtomA.RepulsiveExponent, AtomB.RepulsiveExponent);
     C = GetCMie(RepulsiveExponent, AttractiveExponent);
 
     SigmaOverDistanceM = pow(Sigma/Distance, AttractiveExponent);
@@ -372,8 +372,8 @@ double GetPotentialSteele(ATOM Atom, double height) {
 
   binaryInteractionParameter = -0.035;
 
-  sigma = GetSigma(Atom.Sigma, sigmaCarbon)*ANGSTRON;
-  epsilon = (1-binaryInteractionParameter)*GetEpsilon(Atom.Epsilon, epsilonCarbon);
+  sigma = GetSigmaCombination(Atom.Sigma, sigmaCarbon)*ANGSTRON;
+  epsilon = (1-binaryInteractionParameter)*GetEpsilonCombination(Atom.Epsilon, epsilonCarbon);
 
   height = height*ANGSTRON;
 
@@ -415,18 +415,18 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
           );
           SeparationVector = ApplyPeriodicBoundaryConditionsVector(SeparationVector);
           Distance = Norm(SeparationVector);
-          sigma = GetSigma(Configuration.Molecules[i].Atoms[j].Sigma, Configuration.Molecules[k].Atoms[l].Sigma);
+          sigma = GetSigmaCombination(Configuration.Molecules[i].Atoms[j].Sigma, Configuration.Molecules[k].Atoms[l].Sigma);
 
           if (Potential == LENNARD_JONES && Distance < CUTOFF_DISTANCE){
-            epsilon = GetEpsilon(
+            epsilon = GetEpsilonCombination(
               Configuration.Molecules[i].Atoms[j].Epsilon, 
               Configuration.Molecules[k].Atoms[l].Epsilon
             );
-            RepulsiveExponent = GetInteractionExponent(
+            RepulsiveExponent = GetExponentCombination(
               Configuration.Molecules[i].Atoms[j].RepulsiveExponent, 
               Configuration.Molecules[k].Atoms[l].RepulsiveExponent
             );
-            AttractiveExponent = GetInteractionExponent(
+            AttractiveExponent = GetExponentCombination(
               Configuration.Molecules[i].Atoms[j].AttractiveExponent, 
               Configuration.Molecules[k].Atoms[l].AttractiveExponent
             );
@@ -504,10 +504,10 @@ double GetPotentialLongRangeCorrection(CONFIGURATION Configuration) {
 
     for (int i = 0; i < NUMBER_PSEUDO_ATOMS_TYPES; i++) {
       for (int j = i; j < NUMBER_PSEUDO_ATOMS_TYPES; j++) {
-        double Sigma = GetSigma(SigmaAlkane[i], SigmaAlkane[j]);
-        double Epsilon = GetEpsilon(EpsilonAlkane[i], EpsilonAlkane[j]);
-        double RepulsiveExponent = GetInteractionExponent(RepulsiveExponentAlkane[i], RepulsiveExponentAlkane[j]);
-        double AttractiveExponent = GetInteractionExponent(AttractiveExponentAlkane[i], AttractiveExponentAlkane[j]);
+        double Sigma = GetSigmaCombination(SigmaAlkane[i], SigmaAlkane[j]);
+        double Epsilon = GetEpsilonCombination(EpsilonAlkane[i], EpsilonAlkane[j]);
+        double RepulsiveExponent = GetExponentCombination(RepulsiveExponentAlkane[i], RepulsiveExponentAlkane[j]);
+        double AttractiveExponent = GetExponentCombination(AttractiveExponentAlkane[i], AttractiveExponentAlkane[j]);
         double C = GetCMie(RepulsiveExponent, AttractiveExponent);
         double SigmaCutoffN = pow(Sigma/CUTOFF_DISTANCE, RepulsiveExponent);
         double SigmaCutoffM = pow(Sigma/CUTOFF_DISTANCE, AttractiveExponent);

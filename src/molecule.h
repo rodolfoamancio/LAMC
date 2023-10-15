@@ -105,10 +105,10 @@ typedef struct{
 // Molecules functions
 // ---------------------------------------------------------------------------------------------------------------
 
-// Mixture rules fucntions
-double GetSigma(double SigmaA, double SigmaB);
-double GetEpsilon(double EpsilonA, double EpsilonB);
-double GetInteractionExponent(double ExponentA, double ExponentB);
+// Combinig rules fucntions
+double GetSigmaCombination(double SigmaA, double SigmaB);
+double GetEpsilonCombination(double EpsilonA, double EpsilonB);
+double GetExponentCombination(double ExponentA, double ExponentB);
 
 // Functions for configuring molecules
 double GetAlkaneRepulsiveExponent(enum CarbonType Type);
