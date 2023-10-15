@@ -47,6 +47,11 @@ static const double RepulsiveExponentAlkane[3] = {
     14,
     14
 };
+static const double AttractiveExponentAlkane[3] = {
+    6,
+    6,
+    6
+};
 static const double PseudoAtomMolarMass[3] = {
     16.04206, 
     15.03422, 
