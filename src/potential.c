@@ -344,9 +344,9 @@ VECTOR GetPotentialGradient(VECTOR SeparationVector, ATOM AtomA, ATOM AtomB) {
         -RepulsiveExponent*SigmaOverDistanceN
       )
     );
-    PotentialGradient.x = PotentialGradientModule * SeparationVector.x; 
-    PotentialGradient.y = PotentialGradientModule * SeparationVector.y; 
-    PotentialGradient.z = PotentialGradientModule * SeparationVector.z;
+    PotentialGradient.x = PotentialGradientModule*SeparationVector.x/Distance; 
+    PotentialGradient.y = PotentialGradientModule*SeparationVector.y/Distance; 
+    PotentialGradient.z = PotentialGradientModule*SeparationVector.z/Distance;
   } else {
     PotentialGradient.x = 0.0;
     PotentialGradient.y = 0.0;
