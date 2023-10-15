@@ -249,9 +249,13 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
             Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].RepulsiveExponent, 
             Configuration.Molecules[i].Atoms[j].RepulsiveExponent
           );
+          AttractiveExponent = GetInteractionExponent(
+            Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].AttractiveExponent, 
+            Configuration.Molecules[i].Atoms[j].AttractiveExponent
+          );
           potential = GetPotentialMie(
             RepulsiveExponent,
-            6,
+            AttractiveExponent,
             sigma,
             epsilon,
             Distance
@@ -314,25 +318,30 @@ POTENTIAL GetPotentialExternalField(ATOM Atom) {
  * **************************************************************************************************************/
 VECTOR GetPotentialGradient(VECTOR SeparationVector, ATOM AtomA, ATOM AtomB) {
   VECTOR PotentialGradient;
-  double Sigma, Epsilon;
-  double DistanceSquared;
-  double SigmaOverDistance6, SigmaOverDistance12;
+  double Sigma, Epsilon, AttractiveExponent, RepulsiveExponent, C;
+  double Distance;
+  double SigmaOverDistanceM, SigmaOverDistanceN;
 
-  DistanceSquared = NormSquared(SeparationVector);
+  Distance = Norm(SeparationVector);
 
-  if (DistanceSquared < CUTOFF_SQUARED) {
+  if (Distance < CUTOFF_DISTANCE) {
     Sigma = GetSigma(AtomA.Sigma, AtomB.Sigma);
     Epsilon = GetEpsilon(AtomA.Epsilon, AtomB.Epsilon);
-    SigmaOverDistance6 = Cube(Squared(Sigma) / DistanceSquared);
-    SigmaOverDistance12 = Squared(SigmaOverDistance6);
+    AttractiveExponent = GetInteractionExponent(AtomA.AttractiveExponent, AtomB.AttractiveExponent);
+    RepulsiveExponent = GetInteractionExponent(AtomA.RepulsiveExponent, AtomB.RepulsiveExponent);
+    C = GetCMie(RepulsiveExponent, AttractiveExponent);
+
+    SigmaOverDistanceM = pow(Sigma/Distance, AttractiveExponent);
+    SigmaOverDistanceN = pow(Sigma/Distance, RepulsiveExponent);
 
     double PotentialGradientModule = (
-      (
-        48.0 
-        * Epsilon 
-        * (0.5 * SigmaOverDistance6 - SigmaOverDistance12) / DistanceSquared
-      ) 
-      / ANGSTRON
+      C
+      *Epsilon
+      *(1/(Distance*ANGSTRON))
+      *(
+        AttractiveExponent*SigmaOverDistanceM
+        -RepulsiveExponent*SigmaOverDistanceN
+      )
     );
     PotentialGradient.x = PotentialGradientModule * SeparationVector.x; 
     PotentialGradient.y = PotentialGradientModule * SeparationVector.y; 
@@ -388,9 +397,9 @@ double GetPotentialSteele(ATOM Atom, double height) {
 double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Potential) {
   VECTOR SeparationVector;
   double Sum = 0.0;
-  double SigmaOverDistance6, SigmaOverDistance12;
+  double RepulsiveExponent, AttractiveExponent;
   double potential;
-  double DistanceSquared;
+  double Distance;
   double sigma, epsilon;
   int i, j, k, l, k0, l0;
 
@@ -405,24 +414,38 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
             Configuration.Molecules[k].Atoms[l].Position
           );
           SeparationVector = ApplyPeriodicBoundaryConditionsVector(SeparationVector);
-          DistanceSquared = NormSquared(SeparationVector);
+          Distance = Norm(SeparationVector);
           sigma = GetSigma(Configuration.Molecules[i].Atoms[j].Sigma, Configuration.Molecules[k].Atoms[l].Sigma);
 
-          if (Potential == LENNARD_JONES && DistanceSquared < CUTOFF_SQUARED){
-            epsilon = GetEpsilon(Configuration.Molecules[i].Atoms[j].Epsilon, Configuration.Molecules[k].Atoms[l].Epsilon);
-            SigmaOverDistance6 = pow(sigma, 6)/Cube(DistanceSquared);
-            SigmaOverDistance12 = SigmaOverDistance6 * SigmaOverDistance6;
-            potential = 4 * epsilon * (SigmaOverDistance12 - SigmaOverDistance6);
+          if (Potential == LENNARD_JONES && Distance < CUTOFF_DISTANCE){
+            epsilon = GetEpsilon(
+              Configuration.Molecules[i].Atoms[j].Epsilon, 
+              Configuration.Molecules[k].Atoms[l].Epsilon
+            );
+            RepulsiveExponent = GetInteractionExponent(
+              Configuration.Molecules[i].Atoms[j].RepulsiveExponent, 
+              Configuration.Molecules[k].Atoms[l].RepulsiveExponent
+            );
+            AttractiveExponent = GetInteractionExponent(
+              Configuration.Molecules[i].Atoms[j].AttractiveExponent, 
+              Configuration.Molecules[k].Atoms[l].AttractiveExponent
+            );
+            potential = GetPotentialMie(
+              RepulsiveExponent,
+              AttractiveExponent,
+              sigma,
+              epsilon,
+              Distance
+            );
             Sum += potential;
             if(Beta*potential > 1000) return 1E6;
-          }else if (Potential == HARD_SPHERE && DistanceSquared < Squared(sigma)){
+          }else if (Potential == HARD_SPHERE && Distance < sigma){
             return 1E6;
           }
         }
       }
     }
   }
-
   return Sum;
 }
 
@@ -483,18 +506,25 @@ double GetPotentialLongRangeCorrection(CONFIGURATION Configuration) {
       for (int j = i; j < NUMBER_PSEUDO_ATOMS_TYPES; j++) {
         double Sigma = GetSigma(SigmaAlkane[i], SigmaAlkane[j]);
         double Epsilon = GetEpsilon(EpsilonAlkane[i], EpsilonAlkane[j]);
-        double SigmaOverCutoff = Sigma / CUTOFF_DISTANCE;
-        double SigmaOverCutoffPower3 = Cube(SigmaOverCutoff);
-        double SigmaOverCutoffPower9 = Cube(SigmaOverCutoffPower3);
+        double RepulsiveExponent = GetInteractionExponent(RepulsiveExponentAlkane[i], RepulsiveExponentAlkane[j]);
+        double AttractiveExponent = GetInteractionExponent(AttractiveExponentAlkane[i], AttractiveExponentAlkane[j]);
+        double C = GetCMie(RepulsiveExponent, AttractiveExponent);
+        double SigmaCutoffN = pow(Sigma/CUTOFF_DISTANCE, RepulsiveExponent);
+        double SigmaCutoffM = pow(Sigma/CUTOFF_DISTANCE, AttractiveExponent);
         AuxInteractions += (
-          (4.0/3.0)
-          *NumberPesudoAtoms[i]*NumberPesudoAtoms[j]
-          *(Epsilon * Cube(Sigma/METER_TO_ANGSTRON)
-          *((1./3.)*SigmaOverCutoffPower9 - SigmaOverCutoffPower3)));
+          NumberPesudoAtoms[i]
+          *NumberPesudoAtoms[j]
+          *Epsilon
+          *C
+          *(
+            (1.0/(3 - RepulsiveExponent))*SigmaCutoffN
+            -(1.0/(3 - AttractiveExponent))*SigmaCutoffM
+          )
+        );
       }
     }
 
-    PotentialLongRangeCorrection = 2.0 * M_PI * AuxInteractions / VolumeCubicMeters;
+    PotentialLongRangeCorrection = -2.0*M_PI*AuxInteractions*Cube(CUTOFF_DISTANCE*ANGSTRON)/VolumeCubicMeters;
   }
   
   return PotentialLongRangeCorrection;
