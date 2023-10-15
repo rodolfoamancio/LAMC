@@ -241,7 +241,7 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
           PartialPotential.overlap = true;
           PartialPotential.potential = 1E30;
           return PartialPotential;
-        }else if(ReferencePotential == LENNARD_JONES && Distance < CUTOFF_DISTANCE){
+        }else if(ReferencePotential == MIE && Distance < CUTOFF_DISTANCE){
           epsilon = GetEpsilonCombination(
               Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].Epsilon, 
               Configuration.Molecules[i].Atoms[j].Epsilon
@@ -418,7 +418,7 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
           Distance = Norm(SeparationVector);
           sigma = GetSigmaCombination(Configuration.Molecules[i].Atoms[j].Sigma, Configuration.Molecules[k].Atoms[l].Sigma);
 
-          if (Potential == LENNARD_JONES && Distance < CUTOFF_DISTANCE){
+          if (Potential == MIE && Distance < CUTOFF_DISTANCE){
             epsilon = GetEpsilonCombination(
               Configuration.Molecules[i].Atoms[j].Epsilon, 
               Configuration.Molecules[k].Atoms[l].Epsilon
@@ -480,7 +480,7 @@ double GetTotalPotentialExternal(CONFIGURATION Configuration){
 double GetPotentialLongRangeCorrection(CONFIGURATION Configuration) {
   double PotentialLongRangeCorrection = 0.0;
   
-  if (ReferencePotential == LENNARD_JONES) {
+  if (ReferencePotential == MIE) {
     int NumberPesudoAtoms[NUMBER_PSEUDO_ATOMS_TYPES] = {0, 0, 0};
     double VolumeCubicMeters = SimulationBox.volume / Cube(METER_TO_ANGSTRON);
     double AuxInteractions = 0;

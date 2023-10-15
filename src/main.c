@@ -47,8 +47,8 @@ double RunSimulation(char* InputFileName){
   VolumeAcceptanceCalculated=DisplacementAcceptanceCalculated=0;
 
   // Placeholder parameters before reading input files
-  ReferencePotential = LENNARD_JONES;
-  PerturbationPotential = LENNARD_JONES;
+  ReferencePotential = MIE;
+  PerturbationPotential = MIE;
 
   // Input file data
   ReadInputFile(InputFileName);

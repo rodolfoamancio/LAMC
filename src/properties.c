@@ -107,7 +107,7 @@ double GetPressureExcess(CONFIGURATION Configuration){
   double VolumeMeters = SimulationBox.volume*Cube(ANGSTRON);
   double PressureExcess = 0.0;
 
-  if(ReferencePotential == LENNARD_JONES){
+  if(ReferencePotential == MIE){
     StrainDerivativeTensor.xx=StrainDerivativeTensor.xy=StrainDerivativeTensor.xz=0.0;
     StrainDerivativeTensor.yx=StrainDerivativeTensor.yy=StrainDerivativeTensor.yz=0.0;
     StrainDerivativeTensor.zx=StrainDerivativeTensor.zy=StrainDerivativeTensor.zz=0.0;
