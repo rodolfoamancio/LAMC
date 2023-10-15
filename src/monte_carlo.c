@@ -93,7 +93,10 @@ VECTOR SampleBeadPosition(MOLECULE Molecule, int Bead) {
     VECTOR DirectionalUnitVector;
 
     // Sample bond length
-    BondLength = SampleBondLength();
+    BondLength = SampleBondLength(
+      Molecule.Atoms[Bead-1].Type,
+      Molecule.Atoms[Bead].Type
+    );
 
     if(Bead==1){
         // Random unit vector for first bead

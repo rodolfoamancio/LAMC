@@ -40,7 +40,7 @@ double GetPotentialBending(double theta);
 double GetPotentialTorsion(double phi);
 double GetPotentialBonded(CONFIGURATION Configuration);
 
-double SampleBondLength(void);
+double SampleBondLength(enum CarbonType TypeA, enum CarbonType TypeB);
 VECTOR SampleBendingAngle(VECTOR r1, VECTOR r2);
 VECTOR SampleBendingTorsionAngles(VECTOR r1, VECTOR r2, VECTOR r3);
 

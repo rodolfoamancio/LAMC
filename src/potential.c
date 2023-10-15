@@ -104,14 +104,14 @@ double GetPotentialBonded(CONFIGURATION Configuration) {
   for(int i=0; i<Configuration.NumberMolecules; ++i) {
     MOLECULE molecule = Configuration.Molecules[i];
     
-    // loop for bond stretching energy potential
-    for(int j=0; j<ChainSize - 1; ++j) {
-      ATOM atom1 = molecule.Atoms[j];
-      ATOM atom2 = molecule.Atoms[j+1];
+    // // loop for bond stretching energy potential
+    // for(int j=0; j<ChainSize - 1; ++j) {
+    //   ATOM atom1 = molecule.Atoms[j];
+    //   ATOM atom2 = molecule.Atoms[j+1];
       
-      double BondLength = CalculateDistance(atom1.Position, atom2.Position);
-      total += GetPotentialStreaching(BondLength);
-    }
+    //   double BondLength = CalculateDistance(atom1.Position, atom2.Position);
+    //   total += GetPotentialStreaching(BondLength);
+    // }
     
     // loop for molecular bending energy potential
     for(int j=0; j<ChainSize-2; ++j) {
@@ -141,17 +141,18 @@ double GetPotentialBonded(CONFIGURATION Configuration) {
 /* ***************************************************************************************************************
  * Name       | SampleBondLength
  * ---------------------------------------------------------------------------------------------------------------
- * Function   | Samples a bond length from a probability distribution.
+ * Function   | Samples a bond length from the corresponding carbon types.
  * Returns    | The sampled bond length.
  * **************************************************************************************************************/
-double SampleBondLength(void){
-  double sigma = sqrt(1./(Beta*kStreaching));
-  double a = 1.0/Squared((dEq + 3.*sigma));
-  double d;
-  
-  do d = dEq + sigma*GetRandomGaussianNumber();
-  while((GetRandomNumber()>Squared(d)*a)||d<=0);
-  return d;
+double SampleBondLength(enum CarbonType TypeA, enum CarbonType TypeB){
+  if(TypeA == CH2 && TypeB == CH2){
+    return 1.54;
+  }else if (
+    (TypeA == CH2 && TypeB == CH3)
+    || (TypeA == CH3 && TypeB == CH2)
+  ){
+    return 1.56;  
+  }
 }
 
 /* ***************************************************************************************************************
