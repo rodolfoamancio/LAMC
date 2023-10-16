@@ -150,6 +150,7 @@ double SampleBondLength(enum CarbonType TypeA, enum CarbonType TypeB){
   }else if (
     (TypeA == CH2 && TypeB == CH3)
     || (TypeA == CH3 && TypeB == CH2)
+    || (TypeA == CH3 && TypeB == CH3)
   ){
     return 1.56;  
   }
