@@ -336,7 +336,7 @@ VECTOR GetPotentialGradient(VECTOR SeparationVector, ATOM AtomA, ATOM AtomB) {
     SigmaOverDistanceM = pow(Sigma/Distance, AttractiveExponent);
     SigmaOverDistanceN = pow(Sigma/Distance, RepulsiveExponent);
 
-    double PotentialGradientModule = (
+    double PotentialGradientModule = -1.0*(
       C
       *Epsilon
       *(1/(Distance*ANGSTRON))
