@@ -241,12 +241,14 @@ double GetRosenbluthWeightGhostMolecule(CONFIGURATION Configuration){
     for(int j = 0; j < TestConfiguration.Molecules[i].Size; j++)
       TestConfiguration.Molecules[i].Atoms[j] = Configuration.Molecules[i].Atoms[j];
   }
-
+  
   MoleculeIndex = TestConfiguration.NumberMolecules-1;
   TestConfiguration.Molecules[MoleculeIndex].Size = Configuration.Molecules[0].Size;
   TestConfiguration.Molecules[MoleculeIndex].MolarMass = Configuration.Molecules[0].MolarMass;
   TestConfiguration.Molecules[MoleculeIndex].Atoms = (ATOM*) calloc(TestConfiguration.Molecules[0].Size, sizeof(ATOM));
-
+  for(int j=0; j<TestConfiguration.Molecules[MoleculeIndex].Size; j++)
+    TestConfiguration.Molecules[MoleculeIndex].Atoms[j] = Configuration.Molecules[0].Atoms[j];
+    
   // insert molecule
   TestConfiguration.Molecules[MoleculeIndex].Atoms[0].Position = GetRandomPosition();
   Potential = GetPartialExternalPotential(TestConfiguration, MoleculeIndex, 0);
