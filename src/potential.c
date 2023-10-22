@@ -150,9 +150,10 @@ double SampleBondLength(enum CarbonType TypeA, enum CarbonType TypeB){
   }else if (
     (TypeA == CH2 && TypeB == CH3)
     || (TypeA == CH3 && TypeB == CH2)
-    || (TypeA == CH3 && TypeB == CH3)
   ){
     return 1.56;  
+  }else if(TypeA == CH3e && TypeB == CH3e){
+    return 1.58;
   }
 }
 
@@ -332,11 +333,10 @@ VECTOR GetPotentialGradient(VECTOR SeparationVector, ATOM AtomA, ATOM AtomB) {
     AttractiveExponent = GetExponentCombination(AtomA.AttractiveExponent, AtomB.AttractiveExponent);
     RepulsiveExponent = GetExponentCombination(AtomA.RepulsiveExponent, AtomB.RepulsiveExponent);
     C = GetCMie(RepulsiveExponent, AttractiveExponent);
-
     SigmaOverDistanceM = pow(Sigma/Distance, AttractiveExponent);
     SigmaOverDistanceN = pow(Sigma/Distance, RepulsiveExponent);
 
-    double PotentialGradientModule = -1.0*(
+    double PotentialGradientModule = (
       C
       *Epsilon
       *(1/(Distance*ANGSTRON))
@@ -480,9 +480,10 @@ double GetTotalPotentialExternal(CONFIGURATION Configuration){
  * **************************************************************************************************************/
 double GetPotentialLongRangeCorrection(CONFIGURATION Configuration) {
   double PotentialLongRangeCorrection = 0.0;
-  
+  enum CarbonType TypeA, TypeB;
+
   if (ReferencePotential == MIE) {
-    int NumberPesudoAtoms[NUMBER_PSEUDO_ATOMS_TYPES] = {0, 0, 0};
+    int NumberPesudoAtoms[NUMBER_PSEUDO_ATOMS_TYPES] = {0, 0, 0, 0};
     double VolumeCubicMeters = SimulationBox.volume / Cube(METER_TO_ANGSTRON);
     double AuxInteractions = 0;
 
@@ -493,12 +494,16 @@ double GetPotentialLongRangeCorrection(CONFIGURATION Configuration) {
             NumberPesudoAtoms[0]++;
             break;
           
-          case CH3:
+          case CH3e:
             NumberPesudoAtoms[1]++;
             break;
           
-          case CH2:
+          case CH3:
             NumberPesudoAtoms[2]++;
+            break;
+          
+          case CH2:
+            NumberPesudoAtoms[3]++;
             break;
         }
       }
@@ -506,10 +511,30 @@ double GetPotentialLongRangeCorrection(CONFIGURATION Configuration) {
 
     for (int i = 0; i < NUMBER_PSEUDO_ATOMS_TYPES; i++) {
       for (int j = i; j < NUMBER_PSEUDO_ATOMS_TYPES; j++) {
-        double Sigma = GetSigmaCombination(SigmaAlkane[i], SigmaAlkane[j]);
-        double Epsilon = GetEpsilonCombination(EpsilonAlkane[i], EpsilonAlkane[j]);
-        double RepulsiveExponent = GetExponentCombination(RepulsiveExponentAlkane[i], RepulsiveExponentAlkane[j]);
-        double AttractiveExponent = GetExponentCombination(AttractiveExponentAlkane[i], AttractiveExponentAlkane[j]);
+        if(i == 0){
+          TypeA = CH4;
+        }else if(i == 1){
+          TypeA = CH3e;
+        }else if(i == 2){
+          TypeA = CH3;
+        }else{
+          TypeA = CH2;
+        }
+
+        if(j == 0){
+          TypeB = CH4;
+        }else if(j == 1){
+          TypeB = CH3e;
+        }else if(j == 2){
+          TypeB = CH3;
+        }else{
+          TypeB = CH2;
+        }
+
+        double Sigma = GetSigmaCombination(GetAlkaneSigma(TypeA), GetAlkaneSigma(TypeB));
+        double Epsilon = GetEpsilonCombination(GetAlkaneEpsilon(TypeA), GetAlkaneEpsilon(TypeB));
+        double RepulsiveExponent = GetExponentCombination(GetAlkaneRepulsiveExponent(TypeA), GetAlkaneRepulsiveExponent(TypeB));
+        double AttractiveExponent = GetExponentCombination(GetAlkaneAttractiveExponent(TypeA), GetAlkaneAttractiveExponent(TypeB));
         double C = GetCMie(RepulsiveExponent, AttractiveExponent);
         double SigmaCutoffN = pow(Sigma/CUTOFF_DISTANCE, RepulsiveExponent);
         double SigmaCutoffM = pow(Sigma/CUTOFF_DISTANCE, AttractiveExponent);
@@ -540,8 +565,8 @@ double GetPotentialLongRangeCorrection(CONFIGURATION Configuration) {
  * Returns    | None
  * **************************************************************************************************************/
 void ComputeNonbondedForces(CONFIGURATION *Configuration){
-  VECTOR Force;
-  VECTOR SeparationVector;
+  VECTOR Forcejl;
+  VECTOR SeparationVectorlj;
 
   for(int i=0; i<Configuration->NumberMolecules; i++){
     for(int j=0; j<Configuration->Molecules[i].Size; j++){
@@ -555,36 +580,36 @@ void ComputeNonbondedForces(CONFIGURATION *Configuration){
     for(int j=0; j<Configuration->Molecules[i].Size; j++){
       for(int k=i+1; k<Configuration->NumberMolecules; k++){
         for(int l=0; l<Configuration->Molecules[k].Size; l++){
-          SeparationVector = VectorSubtraction(
+          SeparationVectorlj = VectorSubtraction(
             Configuration->Molecules[i].Atoms[j].Position,
             Configuration->Molecules[k].Atoms[l].Position
           );
-          SeparationVector = ApplyPeriodicBoundaryConditionsVector(SeparationVector);
-          Force = GetPotentialGradient(
-            SeparationVector, 
+          SeparationVectorlj = ApplyPeriodicBoundaryConditionsVector(SeparationVectorlj);
+          Forcejl = GetPotentialGradient(
+            SeparationVectorlj, 
             Configuration->Molecules[i].Atoms[j], 
             Configuration->Molecules[k].Atoms[l]
           );
-          Configuration->Molecules[i].Atoms[j].Force = VectorSubtraction(
-            Configuration->Molecules[i].Atoms[j].Force, Force
+          Configuration->Molecules[i].Atoms[j].Force = VectorSum(
+            Configuration->Molecules[i].Atoms[j].Force, Forcejl
           );
-          Configuration->Molecules[k].Atoms[l].Force = VectorSum(
-            Configuration->Molecules[k].Atoms[l].Force, Force
+          Configuration->Molecules[k].Atoms[l].Force = VectorSubtraction(
+            Configuration->Molecules[k].Atoms[l].Force, Forcejl
           );
 
-          SeparationVector = MultiplyVectorScalar(SeparationVector, ANGSTRON);
+          SeparationVectorlj = MultiplyVectorScalar(SeparationVectorlj, ANGSTRON);
 
-          StrainDerivativeTensor.xx += Force.x*SeparationVector.x;
-          StrainDerivativeTensor.yx += Force.y*SeparationVector.x;
-          StrainDerivativeTensor.zx += Force.z*SeparationVector.x;
+          StrainDerivativeTensor.xx += Forcejl.x*SeparationVectorlj.x;
+          StrainDerivativeTensor.yx += Forcejl.y*SeparationVectorlj.x;
+          StrainDerivativeTensor.zx += Forcejl.z*SeparationVectorlj.x;
 
-          StrainDerivativeTensor.xy += Force.x*SeparationVector.y;
-          StrainDerivativeTensor.yy += Force.y*SeparationVector.y;
-          StrainDerivativeTensor.zy += Force.z*SeparationVector.y;
+          StrainDerivativeTensor.xy += Forcejl.x*SeparationVectorlj.y;
+          StrainDerivativeTensor.yy += Forcejl.y*SeparationVectorlj.y;
+          StrainDerivativeTensor.zy += Forcejl.z*SeparationVectorlj.y;
 
-          StrainDerivativeTensor.xz += Force.x*SeparationVector.z;
-          StrainDerivativeTensor.yz += Force.y*SeparationVector.z;
-          StrainDerivativeTensor.zz += Force.z*SeparationVector.z;
+          StrainDerivativeTensor.xz += Forcejl.x*SeparationVectorlj.z;
+          StrainDerivativeTensor.yz += Forcejl.y*SeparationVectorlj.z;
+          StrainDerivativeTensor.zz += Forcejl.z*SeparationVectorlj.z;
         }
       }
     }

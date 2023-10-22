@@ -30,15 +30,7 @@ void InitializeConfiguration(CONFIGURATION* Configuration){
   Configuration->Molecules[0].MolarMass = 0;
 
   for(int j=0; j<ChainSize; j++){
-    if(ChainSize==1){
-      Configuration->Molecules[0].Atoms[j].Type = CH4;
-    }else{
-      Configuration->Molecules[0].Atoms[j].Type = (
-        (j==0 || j==Configuration->Molecules[0].Size-1) ? 
-        CH3 : 
-        CH2
-      );
-    }
+    Configuration->Molecules[0].Atoms[j].Type = GetCarbonType(ChainSize, j);
     Configuration->Molecules[0].Atoms[j].Epsilon = GetAlkaneEpsilon(Configuration->Molecules[0].Atoms[j].Type);
     Configuration->Molecules[0].Atoms[j].Sigma = GetAlkaneSigma(Configuration->Molecules[0].Atoms[j].Type);
     Configuration->Molecules[0].Atoms[j].MolarMass = GetAlkaneAtomMolarMass(Configuration->Molecules[0].Atoms[j].Type);
@@ -299,19 +291,19 @@ double GenerateInitialConfiguration(CONFIGURATION* Configuration){
   double xStart, xEnd, yStart, yEnd, zStart, zEnd;
   int SelectedTrialOrientation;
 
-  xSize = SimulationBox.xSize - SigmaAlkane[2];
-  ySize = SimulationBox.ySize - SigmaAlkane[2];
-  zSize = SimulationBox.zSize - SigmaAlkane[2];
+  xSize = SimulationBox.xSize - Configuration->Molecules[0].Atoms[0].Sigma;
+  ySize = SimulationBox.ySize - Configuration->Molecules[0].Atoms[0].Sigma;
+  zSize = SimulationBox.zSize - Configuration->Molecules[0].Atoms[0].Sigma;
 
   CellLength = cbrt(xSize*ySize*zSize/Configuration->NumberMolecules);
 
   xStart = SimulationBox.xMin;
   yStart = SimulationBox.yMin;
-  zStart = SimulationBox.zMin + SigmaAlkane[2]/2;
+  zStart = SimulationBox.zMin + Configuration->Molecules[0].Atoms[0].Sigma/2;
 
-  xEnd = SimulationBox.xMax - SigmaAlkane[2];
-  yEnd = SimulationBox.yMax - SigmaAlkane[2];
-  zEnd = SimulationBox.zMax - SigmaAlkane[2]/2;
+  xEnd = SimulationBox.xMax - Configuration->Molecules[0].Atoms[0].Sigma;
+  yEnd = SimulationBox.yMax - Configuration->Molecules[0].Atoms[0].Sigma;
+  zEnd = SimulationBox.zMax - Configuration->Molecules[0].Atoms[0].Sigma/2;
 
   BasePosition.x = xStart;
   BasePosition.y = yStart;

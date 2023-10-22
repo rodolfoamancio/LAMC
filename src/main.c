@@ -125,7 +125,7 @@ double RunSimulation(char* InputFileName){
   printf("\n----------------------------------------Generating initial configuration------------------------------\n\n");
   CellLength = GenerateInitialConfiguration(&OldConfiguration);
   printf("Initial configuration generated\n");
-  if(ReferencePotential == HARD_SPHERE && CellLength <= SigmaAlkane[2]){
+  if(ReferencePotential == HARD_SPHERE && CellLength <= OldConfiguration.Molecules[0].Atoms[0].Sigma){
     printf("Cell length (%.2f) is to small for Hard-sphere simulation. Reduce system density!. Simulation aborted!", CellLength);
     return -1;
   }

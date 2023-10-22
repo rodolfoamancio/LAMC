@@ -24,56 +24,87 @@
  *              potential energy.
  * **************************************************************************************************************/
 double GetPressureLongRangeCorrection(CONFIGURATION Configuration){
-  ATOM   AtomA, AtomB;
-  int    NumberPesudoAtoms[3] = {0, 0, 0};
-  double VolumeCubicMeters = SimulationBox.volume*Cube(ANGSTRON);
-  double AuxInteractions = 0;
+  double PressureLongRangeCorrection = 0.0;
+  enum CarbonType TypeA, TypeB;
+  if (ReferencePotential == MIE) {
+    int NumberPesudoAtoms[NUMBER_PSEUDO_ATOMS_TYPES] = {0, 0, 0, 0};
+    double VolumeCubicMeters = SimulationBox.volume / Cube(METER_TO_ANGSTRON);
+    double AuxInteractions = 0;
 
-  for(int i = 0; i < Configuration.NumberMolecules; i++){
-    for(int j = 0; j < Configuration.Molecules[i].Size; j++){
-      switch (Configuration.Molecules[i].Atoms[j].Type){
-        case CH4:
-          NumberPesudoAtoms[0]++;
-          break;
-        
-        case CH3:
-          NumberPesudoAtoms[1]++;
-          break;
-        
-        case CH2:
-          NumberPesudoAtoms[2]++;
-          break;
+    for (int i = 0; i < Configuration.NumberMolecules; i++) {
+      for (int j = 0; j < Configuration.Molecules[i].Size; j++) {
+        switch (Configuration.Molecules[i].Atoms[j].Type) {
+          case CH4:
+            NumberPesudoAtoms[0]++;
+            break;
+          
+          case CH3e:
+            NumberPesudoAtoms[1]++;
+            break;
+          
+          case CH3:
+            NumberPesudoAtoms[2]++;
+            break;
+          
+          case CH2:
+            NumberPesudoAtoms[3]++;
+            break;
+        }
       }
     }
-  }
 
-  AuxInteractions = 0;
+    for (int i = 0; i < NUMBER_PSEUDO_ATOMS_TYPES; i++) {
+      for (int j = i; j < NUMBER_PSEUDO_ATOMS_TYPES; j++) {
+        if(i == 0){
+          TypeA = CH4;
+        }else if(i == 1){
+          TypeA = CH3e;
+        }else if(i == 2){
+          TypeA = CH3;
+        }else{
+          TypeA = CH2;
+        }
 
-  for(int i = 0; i < NUMBER_PSEUDO_ATOMS_TYPES; i++){
-    for(int j = 0; j < NUMBER_PSEUDO_ATOMS_TYPES; j++){
-      double Sigma = GetSigmaCombination(SigmaAlkane[i], SigmaAlkane[j]);
-      double Epsilon = GetEpsilonCombination(EpsilonAlkane[i], EpsilonAlkane[j]);
-      double RepulsiveExponent = GetExponentCombination(RepulsiveExponentAlkane[i], RepulsiveExponentAlkane[j]);
-      double AttractiveExponent = GetExponentCombination(AttractiveExponentAlkane[i], AttractiveExponentAlkane[j]);
-      double C = GetCMie(RepulsiveExponent, AttractiveExponent);
-      double SigmaOverCutoff = Sigma/CUTOFF_DISTANCE;
-      double SigmaOverCutoffN = pow(SigmaOverCutoff, RepulsiveExponent);
-      double SigmaOverCutoffM = pow(SigmaOverCutoff, AttractiveExponent);
+        if(j == 0){
+          TypeB = CH4;
+        }else if(j == 1){
+          TypeB = CH3e;
+        }else if(j == 2){
+          TypeB = CH3;
+        }else{
+          TypeB = CH2;
+        }
 
-      AuxInteractions += (
-        NumberPesudoAtoms[i]
-        *NumberPesudoAtoms[j]
-        *C
-        *Epsilon
-        *(
-          (AttractiveExponent/(3-AttractiveExponent))*SigmaOverCutoffM
-          -(RepulsiveExponent/(3-RepulsiveExponent))*SigmaOverCutoffN
-        )
-      );
+        double Sigma = GetSigmaCombination(GetAlkaneSigma(TypeA), GetAlkaneSigma(TypeB));
+        double Epsilon = GetEpsilonCombination(GetAlkaneEpsilon(TypeA), GetAlkaneEpsilon(TypeB));
+        double RepulsiveExponent = GetExponentCombination(
+          GetAlkaneRepulsiveExponent(TypeA), 
+          GetAlkaneRepulsiveExponent(TypeB)
+        );
+        double AttractiveExponent = GetExponentCombination(
+          GetAlkaneAttractiveExponent(TypeA), 
+          GetAlkaneAttractiveExponent(TypeB)
+        );
+        double C = GetCMie(RepulsiveExponent, AttractiveExponent);
+        double SigmaCutoffN = pow(Sigma/CUTOFF_DISTANCE, RepulsiveExponent);
+        double SigmaCutoffM = pow(Sigma/CUTOFF_DISTANCE, AttractiveExponent);
+        AuxInteractions += (
+          NumberPesudoAtoms[i]
+          *NumberPesudoAtoms[j]
+          *C
+          *Epsilon
+          *(
+            (AttractiveExponent/(3-AttractiveExponent))*SigmaCutoffM
+            -(RepulsiveExponent/(3-RepulsiveExponent))*SigmaCutoffN
+          )
+        );
+      }
     }
+
+    PressureLongRangeCorrection = 2.0*M_PI*AuxInteractions*Cube(CUTOFF_DISTANCE*ANGSTRON)/(3.*Squared(VolumeCubicMeters));
   }
 
-  return 2.0*M_PI*AuxInteractions*Cube(CUTOFF_DISTANCE*ANGSTRON)/(3.*Squared(VolumeCubicMeters));
+  return PressureLongRangeCorrection;
 }
 
 /* ***************************************************************************************************************
