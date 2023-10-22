@@ -25,38 +25,12 @@
 // Macros
 // ---------------------------------------------------------------------------------------------------------------
 
-#define NUMBER_PSEUDO_ATOMS_TYPES 3
+#define NUMBER_PSEUDO_ATOMS_TYPES 4
 
 // ---------------------------------------------------------------------------------------------------------------
 // Force-field parameters
 // ---------------------------------------------------------------------------------------------------------------
 
-// Lennard-Jones parameters for intermolecular interatcions
-static const double SigmaAlkane[3] = {
-    3.73, 
-    3.6034, 
-    4.0400
-}; // in A
-static const double EpsilonAlkane[3] = {
-    148*BOLTZMANN_CONSTANT, 
-    136.318*BOLTZMANN_CONSTANT, 
-    52.9133*BOLTZMANN_CONSTANT
-}; // in J
-static const double RepulsiveExponentAlkane[3] = {
-    12,
-    14,
-    14
-};
-static const double AttractiveExponentAlkane[3] = {
-    6,
-    6,
-    6
-};
-static const double PseudoAtomMolarMass[3] = {
-    16.04206, 
-    15.03422, 
-    14.02638
-}; // in g/gmol
 static const double CUTOFF_DISTANCE  = 14; // A
 static const double CUTOFF_SQUARED = (Squared(CUTOFF_DISTANCE));
 // Intramolecular interacions
@@ -75,7 +49,7 @@ static const double cTorsion[3] = {
 // Structures definitions
 // ---------------------------------------------------------------------------------------------------------------
 
-enum CarbonType {CH4, CH3, CH2};
+enum CarbonType {CH4, CH3e, CH3, CH2};
 
 typedef struct{
     enum CarbonType Type;
@@ -111,6 +85,7 @@ double GetEpsilonCombination(double EpsilonA, double EpsilonB);
 double GetExponentCombination(double ExponentA, double ExponentB);
 
 // Functions for configuring molecules
+enum CarbonType GetCarbonType(int ChainLength, int Position);
 double GetAlkaneRepulsiveExponent(enum CarbonType Type);
 double GetAlkaneAttractiveExponent(enum CarbonType Type);
 double GetAlkaneEpsilon(enum CarbonType Type);

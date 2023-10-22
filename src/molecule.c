@@ -50,6 +50,16 @@ double GetExponentCombination(double ExponentA, double ExponentB){
   return (ExponentA != ExponentB) ? sqrt((ExponentA - 3)*(ExponentB - 3)) + 3 : ExponentA;
 }
 
+enum CarbonType GetCarbonType(int ChainLength, int Position){
+  if(ChainLength == 1){
+    return CH4;
+  }else if(ChainLength == 2){
+    return CH3e;
+  }else if(ChainLength > 2){
+    return (Position == 0 || Position == ChainLength - 1) ? CH3 : CH2;
+  }
+}
+
 /* ***************************************************************************************************************
  * Name       | GetAlkaneEpsilon
  * ---------------------------------------------------------------------------------------------------------------
@@ -58,18 +68,19 @@ double GetExponentCombination(double ExponentA, double ExponentB){
  * Returns    | The epsilon value for the specified alkane type.
  * **************************************************************************************************************/
 double GetAlkaneEpsilon(enum CarbonType Type){
-  double Epsilon = 0.0;
   switch(Type){
     case CH4:
-      Epsilon = EpsilonAlkane[0];
+      return 148*BOLTZMANN_CONSTANT;
+      break;
+    case CH3e:
+      return 130.780*BOLTZMANN_CONSTANT;
       break;
     case CH3:
-      Epsilon = EpsilonAlkane[1];
+      return 136.318*BOLTZMANN_CONSTANT;
       break;
     case CH2:
-      Epsilon = EpsilonAlkane[2];
+      return 52.9133*BOLTZMANN_CONSTANT;
   }
-  return Epsilon;
 }
 
 /* ***************************************************************************************************************
@@ -80,20 +91,20 @@ double GetAlkaneEpsilon(enum CarbonType Type){
  * Returns    | The sigma value for the specified alkane type.
  * **************************************************************************************************************/
 double GetAlkaneSigma(enum CarbonType Type){
-  double Sigma = 0.0;
-  switch (Type){
+  switch(Type){
     case CH4:
-      Sigma = SigmaAlkane[0];
+      return 3.73;
+      break;
+    case CH3e:
+      return 3.6463;
       break;
     case CH3:
-      Sigma = SigmaAlkane[1];
+      return 3.6034;
       break;
     case CH2:
-      Sigma = SigmaAlkane[2];
+      return 4.0400;
       break;
-
   }
-  return Sigma;
 }
 
 /* ***************************************************************************************************************
@@ -104,19 +115,7 @@ double GetAlkaneSigma(enum CarbonType Type){
  * Returns    | The repulsive exponent value for the specified alkane type.
  * **************************************************************************************************************/
 double GetAlkaneRepulsiveExponent(enum CarbonType Type){
-  double exponent = 12;
-  switch (Type){
-  case CH4:
-    exponent = RepulsiveExponentAlkane[0];
-    break;
-  case CH3:
-    exponent = RepulsiveExponentAlkane[1];
-    break;
-  case CH2:
-    exponent = RepulsiveExponentAlkane[1];
-    break;
-  }
-  return exponent;
+  return 6;
 }
 
 /* ***************************************************************************************************************
@@ -127,19 +126,7 @@ double GetAlkaneRepulsiveExponent(enum CarbonType Type){
  * Returns    | The attractive exponent value for the specified alkane type.
  * **************************************************************************************************************/
 double GetAlkaneAttractiveExponent(enum CarbonType Type){
-  double exponent = 12;
-  switch (Type){
-  case CH4:
-    exponent = AttractiveExponentAlkane[0];
-    break;
-  case CH3:
-    exponent = AttractiveExponentAlkane[1];
-    break;
-  case CH2:
-    exponent = AttractiveExponentAlkane[1];
-    break;
-  }
-  return exponent;
+  return (Type == CH4) ? 12 : 14;
 }
 
 /* ***************************************************************************************************************
@@ -153,13 +140,13 @@ double GetAlkaneAtomMolarMass(enum CarbonType Type){
   double MolarMass = 0.0;
   switch (Type){
     case CH4:
-      MolarMass = PseudoAtomMolarMass[0];
+      MolarMass = 16.04206;
       break;
     case CH3:
-      MolarMass = PseudoAtomMolarMass[1];
+      MolarMass = 15.03422;
       break;
     case CH2:
-      MolarMass = PseudoAtomMolarMass[2];
+      MolarMass = 14.02638;
       break;
 
   }
