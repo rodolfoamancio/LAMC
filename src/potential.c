@@ -565,8 +565,8 @@ double GetPotentialLongRangeCorrection(CONFIGURATION Configuration) {
  * Returns    | None
  * **************************************************************************************************************/
 void ComputeNonbondedForces(CONFIGURATION *Configuration){
-  VECTOR Forcejl;
-  VECTOR SeparationVectorlj;
+  VECTOR Forcejl, Force;
+  VECTOR SeparationVectorlj, CenterOfMass, Position, Aux;
 
   for(int i=0; i<Configuration->NumberMolecules; i++){
     for(int j=0; j<Configuration->Molecules[i].Size; j++){
@@ -590,10 +590,10 @@ void ComputeNonbondedForces(CONFIGURATION *Configuration){
             Configuration->Molecules[i].Atoms[j], 
             Configuration->Molecules[k].Atoms[l]
           );
-          Configuration->Molecules[i].Atoms[j].Force = VectorSum(
+          Configuration->Molecules[i].Atoms[j].Force = VectorSubtraction(
             Configuration->Molecules[i].Atoms[j].Force, Forcejl
           );
-          Configuration->Molecules[k].Atoms[l].Force = VectorSubtraction(
+          Configuration->Molecules[k].Atoms[l].Force = VectorSum(
             Configuration->Molecules[k].Atoms[l].Force, Forcejl
           );
 
@@ -612,6 +612,26 @@ void ComputeNonbondedForces(CONFIGURATION *Configuration){
           StrainDerivativeTensor.zz += Forcejl.z*SeparationVectorlj.z;
         }
       }
+    }
+  }
+
+  for(int i = 0; i<Configuration->NumberMolecules; i++){
+    for(int j = 0; j<Configuration->Molecules[i].Size; j++){
+      Position = Configuration->Molecules[i].Atoms[j].Position;
+      CenterOfMass = GetMoleculeCenterOfMass(Configuration->Molecules[i]);
+      Force = Configuration->Molecules[i].Atoms[j].Force;
+      Aux = MultiplyVectorScalar(VectorSubtraction(Position, CenterOfMass), ANGSTRON);
+      StrainDerivativeTensor.xx += Force.x*Aux.x;
+      StrainDerivativeTensor.yx += Force.y*Aux.x;
+      StrainDerivativeTensor.zx += Force.z*Aux.x;
+
+      StrainDerivativeTensor.xy += Force.x*Aux.y;
+      StrainDerivativeTensor.yy += Force.y*Aux.y;
+      StrainDerivativeTensor.zy += Force.z*Aux.y;
+
+      StrainDerivativeTensor.xz += Force.x*Aux.z;
+      StrainDerivativeTensor.yz += Force.y*Aux.z;
+      StrainDerivativeTensor.zz += Force.z*Aux.z;
     }
   }
 }
