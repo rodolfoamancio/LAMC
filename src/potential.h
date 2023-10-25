@@ -19,6 +19,7 @@
 #include"simulation_setup.h"
 #include"vectors.h"
 #include"simulation_setup.h"
+#include"structural.h"
 
 typedef struct{
 	double potential;
