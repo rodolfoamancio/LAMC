@@ -142,6 +142,9 @@ double GetAlkaneAtomMolarMass(enum CarbonType Type){
     case CH4:
       MolarMass = 16.04206;
       break;
+    case CH3e:
+      MolarMass = 15.03422;
+      break;
     case CH3:
       MolarMass = 15.03422;
       break;
