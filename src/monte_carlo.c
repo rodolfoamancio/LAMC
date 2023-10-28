@@ -30,18 +30,12 @@ void InitializeConfiguration(CONFIGURATION* Configuration){
   Configuration->Molecules[0].MolarMass = 0;
 
   for(int j=0; j<ChainSize; j++){
-    if(ChainSize==1){
-      Configuration->Molecules[0].Atoms[j].Type = CH4;
-    }else{
-      Configuration->Molecules[0].Atoms[j].Type = (
-        (j==0 || j==Configuration->Molecules[0].Size-1) ? 
-        CH3 : 
-        CH2
-      );
-    }
+    Configuration->Molecules[0].Atoms[j].Type = GetCarbonType(ChainSize, j);
     Configuration->Molecules[0].Atoms[j].Epsilon = GetAlkaneEpsilon(Configuration->Molecules[0].Atoms[j].Type);
     Configuration->Molecules[0].Atoms[j].Sigma = GetAlkaneSigma(Configuration->Molecules[0].Atoms[j].Type);
     Configuration->Molecules[0].Atoms[j].MolarMass = GetAlkaneAtomMolarMass(Configuration->Molecules[0].Atoms[j].Type);
+    Configuration->Molecules[0].Atoms[j].AttractiveExponent = GetAlkaneAttractiveExponent(Configuration->Molecules[0].Atoms[j].Type);
+    Configuration->Molecules[0].Atoms[j].RepulsiveExponent = GetAlkaneRepulsiveExponent(Configuration->Molecules[0].Atoms[j].Type);
     Configuration->Molecules[0].MolarMass += Configuration->Molecules[0].Atoms[j].MolarMass;
   }
 
@@ -91,7 +85,10 @@ VECTOR SampleBeadPosition(MOLECULE Molecule, int Bead) {
     VECTOR DirectionalUnitVector;
 
     // Sample bond length
-    BondLength = SampleBondLength();
+    BondLength = SampleBondLength(
+      Molecule.Atoms[Bead-1].Type,
+      Molecule.Atoms[Bead].Type
+    );
 
     if(Bead==1){
         // Random unit vector for first bead
@@ -236,12 +233,14 @@ double GetRosenbluthWeightGhostMolecule(CONFIGURATION Configuration){
     for(int j = 0; j < TestConfiguration.Molecules[i].Size; j++)
       TestConfiguration.Molecules[i].Atoms[j] = Configuration.Molecules[i].Atoms[j];
   }
-
+  
   MoleculeIndex = TestConfiguration.NumberMolecules-1;
   TestConfiguration.Molecules[MoleculeIndex].Size = Configuration.Molecules[0].Size;
   TestConfiguration.Molecules[MoleculeIndex].MolarMass = Configuration.Molecules[0].MolarMass;
   TestConfiguration.Molecules[MoleculeIndex].Atoms = (ATOM*) calloc(TestConfiguration.Molecules[0].Size, sizeof(ATOM));
-
+  for(int j=0; j<TestConfiguration.Molecules[MoleculeIndex].Size; j++)
+    TestConfiguration.Molecules[MoleculeIndex].Atoms[j] = Configuration.Molecules[0].Atoms[j];
+    
   // insert molecule
   TestConfiguration.Molecules[MoleculeIndex].Atoms[0].Position = GetRandomPosition();
   Potential = GetPartialExternalPotential(TestConfiguration, MoleculeIndex, 0);
@@ -292,19 +291,19 @@ double GenerateInitialConfiguration(CONFIGURATION* Configuration){
   double xStart, xEnd, yStart, yEnd, zStart, zEnd;
   int SelectedTrialOrientation;
 
-  xSize = SimulationBox.xSize - SigmaAlkane[2];
-  ySize = SimulationBox.ySize - SigmaAlkane[2];
-  zSize = SimulationBox.zSize - SigmaAlkane[2];
+  xSize = SimulationBox.xSize - Configuration->Molecules[0].Atoms[0].Sigma;
+  ySize = SimulationBox.ySize - Configuration->Molecules[0].Atoms[0].Sigma;
+  zSize = SimulationBox.zSize - Configuration->Molecules[0].Atoms[0].Sigma;
 
   CellLength = cbrt(xSize*ySize*zSize/Configuration->NumberMolecules);
 
   xStart = SimulationBox.xMin;
   yStart = SimulationBox.yMin;
-  zStart = SimulationBox.zMin + SigmaAlkane[2]/2;
+  zStart = SimulationBox.zMin + Configuration->Molecules[0].Atoms[0].Sigma/2;
 
-  xEnd = SimulationBox.xMax - SigmaAlkane[2];
-  yEnd = SimulationBox.yMax - SigmaAlkane[2];
-  zEnd = SimulationBox.zMax - SigmaAlkane[2]/2;
+  xEnd = SimulationBox.xMax - Configuration->Molecules[0].Atoms[0].Sigma;
+  yEnd = SimulationBox.yMax - Configuration->Molecules[0].Atoms[0].Sigma;
+  zEnd = SimulationBox.zMax - Configuration->Molecules[0].Atoms[0].Sigma/2;
 
   BasePosition.x = xStart;
   BasePosition.y = yStart;

@@ -12,7 +12,7 @@
 #include"molecule.h"
 
 /* ***************************************************************************************************************
- * Name       | GetSigma
+ * Name       | GetSigmaCombination
  * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates the average of two given sigma values.
  * Parameters |
@@ -20,12 +20,12 @@
  *              - SigmaB: The second sigma value.
  * Returns    | The average of SigmaA and SigmaB.
  * **************************************************************************************************************/
-double GetSigma(double SigmaA, double SigmaB){
+double GetSigmaCombination(double SigmaA, double SigmaB){
   return (SigmaA != SigmaB) ? (SigmaA + SigmaB)/2 : SigmaA;
 }
 
 /* ***************************************************************************************************************
- * Name       | GetEpsilon
+ * Name       | GetEpsilonCombination
  * ---------------------------------------------------------------------------------------------------------------
  * Function   | Calculates the square root of the product of two given epsilon values.
  * Parameters |
@@ -33,8 +33,31 @@ double GetSigma(double SigmaA, double SigmaB){
  *              - EpsilonB: The second epsilon value.
  * Returns    | The square root of the product of EpsilonA and EpsilonB.
  * **************************************************************************************************************/
-double GetEpsilon(double EpsilonA, double EpsilonB){
+double GetEpsilonCombination(double EpsilonA, double EpsilonB){
   return (EpsilonA != EpsilonB) ? sqrt(EpsilonA*EpsilonB) : EpsilonA;
+}
+
+/* ***************************************************************************************************************
+ * Name       | GetExponentCombination
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Applies the combination rule from Lafitte (2013) for the exponents of the Mie potential
+ * Parameters |
+ *              - ExponentA: The first exponent value.
+ *              - ExponentA: The second exponent value.
+ * Returns    | The combination exponent
+ * **************************************************************************************************************/
+double GetExponentCombination(double ExponentA, double ExponentB){
+  return (ExponentA != ExponentB) ? sqrt((ExponentA - 3)*(ExponentB - 3)) + 3 : ExponentA;
+}
+
+enum CarbonType GetCarbonType(int ChainLength, int Position){
+  if(ChainLength == 1){
+    return CH4;
+  }else if(ChainLength == 2){
+    return CH3e;
+  }else if(ChainLength > 2){
+    return (Position == 0 || Position == ChainLength - 1) ? CH3 : CH2;
+  }
 }
 
 /* ***************************************************************************************************************
@@ -45,18 +68,19 @@ double GetEpsilon(double EpsilonA, double EpsilonB){
  * Returns    | The epsilon value for the specified alkane type.
  * **************************************************************************************************************/
 double GetAlkaneEpsilon(enum CarbonType Type){
-  double Epsilon = 0.0;
   switch(Type){
     case CH4:
-      Epsilon = EpsilonAlkane[0];
+      return 148*BOLTZMANN_CONSTANT;
+      break;
+    case CH3e:
+      return 130.780*BOLTZMANN_CONSTANT;
       break;
     case CH3:
-      Epsilon = EpsilonAlkane[1];
+      return 136.318*BOLTZMANN_CONSTANT;
       break;
     case CH2:
-      Epsilon = EpsilonAlkane[2];
+      return 52.9133*BOLTZMANN_CONSTANT;
   }
-  return Epsilon;
 }
 
 /* ***************************************************************************************************************
@@ -67,20 +91,42 @@ double GetAlkaneEpsilon(enum CarbonType Type){
  * Returns    | The sigma value for the specified alkane type.
  * **************************************************************************************************************/
 double GetAlkaneSigma(enum CarbonType Type){
-  double Sigma = 0.0;
-  switch (Type){
+  switch(Type){
     case CH4:
-      Sigma = SigmaAlkane[0];
+      return 3.73;
+      break;
+    case CH3e:
+      return 3.6463;
       break;
     case CH3:
-      Sigma = SigmaAlkane[1];
+      return 3.6034;
       break;
     case CH2:
-      Sigma = SigmaAlkane[2];
+      return 4.0400;
       break;
-
   }
-  return Sigma;
+}
+
+/* ***************************************************************************************************************
+ * Name       | GetAlkaneRepulsiveExponent
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Retrieves the repulsive exponent value based on the given CarbonType.
+ * Parameters | - Type: The CarbonType enum representing the type of alkane pseudoatom.
+ * Returns    | The repulsive exponent value for the specified alkane type.
+ * **************************************************************************************************************/
+double GetAlkaneRepulsiveExponent(enum CarbonType Type){
+  return 6;
+}
+
+/* ***************************************************************************************************************
+ * Name       | GetAlkaneAttractiveExponent
+ * ---------------------------------------------------------------------------------------------------------------
+ * Function   | Retrieves the attractive exponent value based on the given CarbonType.
+ * Parameters | - Type: The CarbonType enum representing the type of alkane pseudoatom.
+ * Returns    | The attractive exponent value for the specified alkane type.
+ * **************************************************************************************************************/
+double GetAlkaneAttractiveExponent(enum CarbonType Type){
+  return (Type == CH4) ? 12 : 14;
 }
 
 /* ***************************************************************************************************************
@@ -94,13 +140,16 @@ double GetAlkaneAtomMolarMass(enum CarbonType Type){
   double MolarMass = 0.0;
   switch (Type){
     case CH4:
-      MolarMass = PseudoAtomMolarMass[0];
+      MolarMass = 16.04206;
+      break;
+    case CH3e:
+      MolarMass = 15.03422;
       break;
     case CH3:
-      MolarMass = PseudoAtomMolarMass[1];
+      MolarMass = 15.03422;
       break;
     case CH2:
-      MolarMass = PseudoAtomMolarMass[2];
+      MolarMass = 14.02638;
       break;
 
   }
