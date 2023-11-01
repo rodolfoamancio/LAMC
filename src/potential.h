@@ -19,21 +19,29 @@
 #include"simulation_setup.h"
 #include"vectors.h"
 #include"simulation_setup.h"
+#include"structural.h"
 
 typedef struct{
 	double potential;
 	bool   overlap;
 } POTENTIAL;
 
-enum PotentialType {LENNARD_JONES, HARD_SPHERE};
+enum PotentialType {MIE, HARD_SPHERE};
 extern enum PotentialType ReferencePotential, PerturbationPotential;
 
+double GetCMie(double RepulsiveExponent, double AttractiveExponent);
+double GetPotentialMie(
+  double RepulsiveExponent, 
+  double AttractiveExponent, 
+  double Sigma, 
+  double Epsilon, 
+  double Distance);
 double GetPotentialStreaching(double d);
 double GetPotentialBending(double theta);
 double GetPotentialTorsion(double phi);
 double GetPotentialBonded(CONFIGURATION Configuration);
 
-double SampleBondLength(void);
+double SampleBondLength(enum CarbonType TypeA, enum CarbonType TypeB);
 VECTOR SampleBendingAngle(VECTOR r1, VECTOR r2);
 VECTOR SampleBendingTorsionAngles(VECTOR r1, VECTOR r2, VECTOR r3);
 

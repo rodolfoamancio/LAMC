@@ -24,50 +24,87 @@
  *              potential energy.
  * **************************************************************************************************************/
 double GetPressureLongRangeCorrection(CONFIGURATION Configuration){
-  ATOM   AtomA, AtomB;
-  int    NumberPesudoAtoms[3] = {0, 0, 0};
-  double VolumeCubicMeters = SimulationBox.volume*Cube(ANGSTRON);
-  double AuxInteractions = 0;
+  double PressureLongRangeCorrection = 0.0;
+  enum CarbonType TypeA, TypeB;
+  if (ReferencePotential == MIE) {
+    int NumberPesudoAtoms[NUMBER_PSEUDO_ATOMS_TYPES] = {0, 0, 0, 0};
+    double VolumeCubicMeters = SimulationBox.volume / Cube(METER_TO_ANGSTRON);
+    double AuxInteractions = 0;
 
-  for(int i = 0; i < Configuration.NumberMolecules; i++){
-    for(int j = 0; j < Configuration.Molecules[i].Size; j++){
-      switch (Configuration.Molecules[i].Atoms[j].Type){
-        case CH4:
-          NumberPesudoAtoms[0]++;
-          break;
-        
-        case CH3:
-          NumberPesudoAtoms[1]++;
-          break;
-        
-        case CH2:
-          NumberPesudoAtoms[2]++;
-          break;
+    for (int i = 0; i < Configuration.NumberMolecules; i++) {
+      for (int j = 0; j < Configuration.Molecules[i].Size; j++) {
+        switch (Configuration.Molecules[i].Atoms[j].Type) {
+          case CH4:
+            NumberPesudoAtoms[0]++;
+            break;
+          
+          case CH3e:
+            NumberPesudoAtoms[1]++;
+            break;
+          
+          case CH3:
+            NumberPesudoAtoms[2]++;
+            break;
+          
+          case CH2:
+            NumberPesudoAtoms[3]++;
+            break;
+        }
       }
     }
-  }
 
-  AuxInteractions = 0;
+    for (int i = 0; i < NUMBER_PSEUDO_ATOMS_TYPES; i++) {
+      for (int j = i; j < NUMBER_PSEUDO_ATOMS_TYPES; j++) {
+        if(i == 0){
+          TypeA = CH4;
+        }else if(i == 1){
+          TypeA = CH3e;
+        }else if(i == 2){
+          TypeA = CH3;
+        }else{
+          TypeA = CH2;
+        }
 
-  for(int i = 0; i < NUMBER_PSEUDO_ATOMS_TYPES; i++){
-    AtomA.Epsilon  = EpsilonAlkane[i];
-    AtomA.Sigma    = SigmaAlkane[i];
-    for(int j = 0; j < NUMBER_PSEUDO_ATOMS_TYPES; j++){
-      AtomB.Epsilon  = EpsilonAlkane[j];
-      AtomB.Sigma    = SigmaAlkane[j];
-      double Epsilon = GetEpsilon(AtomA.Epsilon, AtomB.Epsilon);
-      double Sigma   = GetSigma(AtomA.Sigma, AtomB.Sigma);
+        if(j == 0){
+          TypeB = CH4;
+        }else if(j == 1){
+          TypeB = CH3e;
+        }else if(j == 2){
+          TypeB = CH3;
+        }else{
+          TypeB = CH2;
+        }
 
-      double SigmaOverCutoff = Sigma/CUTOFF_DISTANCE;
-      double SigmaOverCutoff3 = Cube(SigmaOverCutoff);
-      double SigmaOverCutoff9 = Cube(SigmaOverCutoff3);
-
-      AuxInteractions += (NumberPesudoAtoms[i]*NumberPesudoAtoms[j]*Epsilon*Cube(Sigma*ANGSTRON)*\
-        ((2./3.)*SigmaOverCutoff9-SigmaOverCutoff3));
+        double Sigma = GetSigmaCombination(GetAlkaneSigma(TypeA), GetAlkaneSigma(TypeB));
+        double Epsilon = GetEpsilonCombination(GetAlkaneEpsilon(TypeA), GetAlkaneEpsilon(TypeB));
+        double RepulsiveExponent = GetExponentCombination(
+          GetAlkaneRepulsiveExponent(TypeA), 
+          GetAlkaneRepulsiveExponent(TypeB)
+        );
+        double AttractiveExponent = GetExponentCombination(
+          GetAlkaneAttractiveExponent(TypeA), 
+          GetAlkaneAttractiveExponent(TypeB)
+        );
+        double C = GetCMie(RepulsiveExponent, AttractiveExponent);
+        double SigmaCutoffN = pow(Sigma/CUTOFF_DISTANCE, RepulsiveExponent);
+        double SigmaCutoffM = pow(Sigma/CUTOFF_DISTANCE, AttractiveExponent);
+        AuxInteractions += (
+          NumberPesudoAtoms[i]
+          *NumberPesudoAtoms[j]
+          *C
+          *Epsilon
+          *(
+            (AttractiveExponent/(3-AttractiveExponent))*SigmaCutoffM
+            -(RepulsiveExponent/(3-RepulsiveExponent))*SigmaCutoffN
+          )
+        );
+      }
     }
+
+    PressureLongRangeCorrection = 2.0*M_PI*AuxInteractions*Cube(CUTOFF_DISTANCE*ANGSTRON)/(3.*Squared(VolumeCubicMeters));
   }
 
-  return 16.*M_PI*AuxInteractions/(3.*Squared(VolumeCubicMeters));
+  return PressureLongRangeCorrection;
 }
 
 /* ***************************************************************************************************************
@@ -101,7 +138,7 @@ double GetPressureExcess(CONFIGURATION Configuration){
   double VolumeMeters = SimulationBox.volume*Cube(ANGSTRON);
   double PressureExcess = 0.0;
 
-  if(ReferencePotential == LENNARD_JONES){
+  if(ReferencePotential == MIE){
     StrainDerivativeTensor.xx=StrainDerivativeTensor.xy=StrainDerivativeTensor.xz=0.0;
     StrainDerivativeTensor.yx=StrainDerivativeTensor.yy=StrainDerivativeTensor.yz=0.0;
     StrainDerivativeTensor.zx=StrainDerivativeTensor.zy=StrainDerivativeTensor.zz=0.0;

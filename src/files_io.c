@@ -36,11 +36,11 @@ char* GetEnsembleLabel(enum ensemble InputEnsemble){
  * Name       | GetPotentialTypeLabel                                                           
  * --------------------------------------------------------------------------------------------------------------- 
  * Function   | Returns the label corresponding to the given potential type.                             
- * Parameters | Potential: An enumeration value representing a potential type (LENNARD_JONES or HARD_SPHERE).                           
+ * Parameters | Potential: An enumeration value representing a potential type (MIE or HARD_SPHERE).                           
  * **************************************************************************************************************/
 char* GetPotentialTypeLabel(enum PotentialType Potential){
-  if(Potential==LENNARD_JONES){
-   return "Lennard-Jones";
+  if(Potential==MIE){
+   return "Mie";
   }else if(Potential==HARD_SPHERE){
    return "Hard-sphere";
   }
@@ -151,15 +151,15 @@ void ReadInputFile(char inputsFilePath[]){
     }
 
    }else if(strcmp(InputName, "REFERENCE_POTENTIAL")==0){
-    if(strcmp(InputData, "LENNARD_JONES")==0){
-     ReferencePotential = LENNARD_JONES;
+    if(strcmp(InputData, "MIE")==0){
+     ReferencePotential = MIE;
     }else if(strcmp(InputData, "HARD_SPHERE")==0){
      ReferencePotential = HARD_SPHERE;
     }
 
    }else if(strcmp(InputName, "PERTURBED_POTENTIAL")==0){
-    if(strcmp(InputData, "LENNARD_JONES")==0){
-     PerturbationPotential = LENNARD_JONES;
+    if(strcmp(InputData, "MIE")==0){
+     PerturbationPotential = MIE;
     }else if(strcmp(InputData, "HARD_SPHERE")==0){
      PerturbationPotential = HARD_SPHERE;
     }
