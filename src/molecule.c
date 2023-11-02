@@ -115,7 +115,7 @@ double GetAlkaneSigma(enum CarbonType Type){
  * Returns    | The repulsive exponent value for the specified alkane type.
  * **************************************************************************************************************/
 double GetAlkaneRepulsiveExponent(enum CarbonType Type){
-  return 6;
+  return (Type == CH4) ? 12 : 14;
 }
 
 /* ***************************************************************************************************************
@@ -126,7 +126,7 @@ double GetAlkaneRepulsiveExponent(enum CarbonType Type){
  * Returns    | The attractive exponent value for the specified alkane type.
  * **************************************************************************************************************/
 double GetAlkaneAttractiveExponent(enum CarbonType Type){
-  return (Type == CH4) ? 12 : 14;
+  return 6;
 }
 
 /* ***************************************************************************************************************
