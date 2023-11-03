@@ -335,8 +335,8 @@ void RecordSimulationLog(char BaseName[]){
     }
     if (Ensemble != muVT) {
         float weightGhostMolecule = AverageWeightGhostMolecule / CountProductionStates;
-        float fugacity = 1E-6 * (AveragePressureIdealGas / weightGhostMolecule);
-        float fugacityCoefficient = fugacity / (1E-6 * (AveragePressure / CountProductionStates));
+        float fugacity = 1E-6 * ((AveragePressureIdealGas/CountProductionStates) / weightGhostMolecule);
+        float fugacityCoefficient = fugacity / (1E-6 * ((AveragePressure/CountProductionStates) / CountProductionStates));
 
         fprintf(LogFile, "----------------------------------------------------------------------------------------------------------------\n");
         fprintf(LogFile, "Weight ghost molecule:..........................: %f \n", weightGhostMolecule);
