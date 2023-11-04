@@ -558,13 +558,14 @@ double GetPotentialLongRangeCorrection(CONFIGURATION Configuration) {
 }
 
 /* ***************************************************************************************************************
- * Name       | ComputeNonbondedForces
+ * Name       | ComputeStrainDerivativeTensor
  * ---------------------------------------------------------------------------------------------------------------
- * Function   | Calculates the nonbonded forces between atoms in the system using the specified potential field.
+ * Function   | Calculates the strain derivative tensor with the appropriate forces based on the reference
+ *            | potential for nonbonded interactions
  * Parameters | - Configuration: The configuration of the system containing molecules and atoms.
  * Returns    | None
  * **************************************************************************************************************/
-void ComputeNonbondedForces(CONFIGURATION *Configuration){
+void ComputeStrainDerivativeTensor(CONFIGURATION *Configuration){
   VECTOR Forcejl, Force;
   VECTOR SeparationVectorlj, CenterOfMass, Position, Aux;
 
@@ -616,9 +617,9 @@ void ComputeNonbondedForces(CONFIGURATION *Configuration){
   }
 
   for(int i = 0; i<Configuration->NumberMolecules; i++){
+    CenterOfMass = GetMoleculeCenterOfMass(Configuration->Molecules[i]);
     for(int j = 0; j<Configuration->Molecules[i].Size; j++){
       Position = Configuration->Molecules[i].Atoms[j].Position;
-      CenterOfMass = GetMoleculeCenterOfMass(Configuration->Molecules[i]);
       Force = Configuration->Molecules[i].Atoms[j].Force;
       Aux = MultiplyVectorScalar(VectorSubtraction(Position, CenterOfMass), ANGSTRON);
       StrainDerivativeTensor.xx += Force.x*Aux.x;

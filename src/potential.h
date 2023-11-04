@@ -52,7 +52,7 @@ double GetPotentialSteele(ATOM Atom, double height);
 double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Potential);
 double GetTotalPotentialExternal(CONFIGURATION Configuration);
 double GetPotentialLongRangeCorrection(CONFIGURATION Configuration);
-void ComputeNonbondedForces(CONFIGURATION *Configuration);
+void ComputeStrainDerivativeTensor(CONFIGURATION *Configuration);
 
 
 #endif

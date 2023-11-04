@@ -143,26 +143,8 @@ double GetPressureExcess(CONFIGURATION Configuration){
     StrainDerivativeTensor.yx=StrainDerivativeTensor.yy=StrainDerivativeTensor.yz=0.0;
     StrainDerivativeTensor.zx=StrainDerivativeTensor.zy=StrainDerivativeTensor.zz=0.0;
     
-    ComputeNonbondedForces(&Configuration);
+    ComputeStrainDerivativeTensor(&Configuration);
     
-    for(int i=0; i<Configuration.NumberMolecules; i++){
-      CenterOfMass = GetMoleculeCenterOfMass(Configuration.Molecules[i]);
-      for(int j=0; j<Configuration.Molecules[i].Size; j++){
-        Position = Configuration.Molecules[i].Atoms[j].Position;
-        Force = Configuration.Molecules[i].Atoms[j].Force;
-        StrainDerivativeTensor.xx += Force.x*(Position.x - CenterOfMass.x)*ANGSTRON;
-        StrainDerivativeTensor.yx += Force.x*(Position.y - CenterOfMass.y)*ANGSTRON;
-        StrainDerivativeTensor.zx += Force.x*(Position.z - CenterOfMass.z)*ANGSTRON;
-
-        StrainDerivativeTensor.xy += Force.y*(Position.x - CenterOfMass.x)*ANGSTRON;
-        StrainDerivativeTensor.yy += Force.y*(Position.y - CenterOfMass.y)*ANGSTRON;
-        StrainDerivativeTensor.zy += Force.y*(Position.z - CenterOfMass.z)*ANGSTRON;
-
-        StrainDerivativeTensor.xz += Force.z*(Position.x - CenterOfMass.x)*ANGSTRON;
-        StrainDerivativeTensor.yz += Force.z*(Position.y - CenterOfMass.y)*ANGSTRON;
-        StrainDerivativeTensor.zz += Force.z*(Position.z - CenterOfMass.z)*ANGSTRON;
-      }
-    }
     Average = 0.5*(StrainDerivativeTensor.xy+StrainDerivativeTensor.yx);
     StrainDerivativeTensor.xy = StrainDerivativeTensor.yx = Average;
     Average = 0.5*(StrainDerivativeTensor.xz+StrainDerivativeTensor.zx);
