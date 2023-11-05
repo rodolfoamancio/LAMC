@@ -152,7 +152,7 @@ double GetPressureExcess(CONFIGURATION Configuration){
     Average = 0.5*(StrainDerivativeTensor.yz+StrainDerivativeTensor.zy);
     StrainDerivativeTensor.yz = StrainDerivativeTensor.zy = Average;
 
-    PressureExcess = -MatrixTrace(StrainDerivativeTensor)/(3.0*VolumeMeters);
+    PressureExcess = -1.0*MatrixTrace(StrainDerivativeTensor)/(3.0*VolumeMeters);
   }else{
     PressureExcess = 0.0;
   }
