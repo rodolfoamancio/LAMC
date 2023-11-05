@@ -238,12 +238,11 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
           Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].Sigma, 
           Configuration.Molecules[i].Atoms[j].Sigma
         );
-
-        if(ReferencePotential == HARD_SPHERE && Distance < sigma){
+        if((ReferencePotential == HARD_SPHERE) && (Distance < sigma)){
           PartialPotential.overlap = true;
           PartialPotential.potential = 1E30;
           return PartialPotential;
-        }else if(ReferencePotential == MIE && Distance < CUTOFF_DISTANCE){
+        }else if((ReferencePotential == MIE) && (Distance < CUTOFF_DISTANCE)){
           epsilon = GetEpsilonCombination(
               Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].Epsilon, 
               Configuration.Molecules[i].Atoms[j].Epsilon
@@ -567,7 +566,7 @@ double GetPotentialLongRangeCorrection(CONFIGURATION Configuration) {
  * **************************************************************************************************************/
 void ComputeStrainDerivativeTensor(CONFIGURATION *Configuration){
   VECTOR Forcejl, Force;
-  VECTOR SeparationVectorlj, CenterOfMass, Position, Aux;
+  VECTOR SeparationVectorlj, CenterOfMass, Position;
 
   for(int i=0; i<Configuration->NumberMolecules; i++){
     for(int j=0; j<Configuration->Molecules[i].Size; j++){
@@ -621,18 +620,17 @@ void ComputeStrainDerivativeTensor(CONFIGURATION *Configuration){
     for(int j = 0; j<Configuration->Molecules[i].Size; j++){
       Position = Configuration->Molecules[i].Atoms[j].Position;
       Force = Configuration->Molecules[i].Atoms[j].Force;
-      Aux = MultiplyVectorScalar(VectorSubtraction(Position, CenterOfMass), ANGSTRON);
-      StrainDerivativeTensor.xx += Force.x*Aux.x;
-      StrainDerivativeTensor.yx += Force.y*Aux.x;
-      StrainDerivativeTensor.zx += Force.z*Aux.x;
+      StrainDerivativeTensor.xx += Force.x*(Position.x - CenterOfMass.x)*ANGSTRON;
+      StrainDerivativeTensor.yx += Force.y*(Position.x - CenterOfMass.x)*ANGSTRON;
+      StrainDerivativeTensor.zx += Force.z*(Position.x - CenterOfMass.x)*ANGSTRON;
 
-      StrainDerivativeTensor.xy += Force.x*Aux.y;
-      StrainDerivativeTensor.yy += Force.y*Aux.y;
-      StrainDerivativeTensor.zy += Force.z*Aux.y;
+      StrainDerivativeTensor.xy += Force.x*(Position.y - CenterOfMass.y)*ANGSTRON;
+      StrainDerivativeTensor.yy += Force.y*(Position.y - CenterOfMass.y)*ANGSTRON;
+      StrainDerivativeTensor.zy += Force.z*(Position.y - CenterOfMass.y)*ANGSTRON;
 
-      StrainDerivativeTensor.xz += Force.x*Aux.z;
-      StrainDerivativeTensor.yz += Force.y*Aux.z;
-      StrainDerivativeTensor.zz += Force.z*Aux.z;
+      StrainDerivativeTensor.xz += Force.x*(Position.z - CenterOfMass.z)*ANGSTRON;
+      StrainDerivativeTensor.yz += Force.y*(Position.z - CenterOfMass.z)*ANGSTRON;
+      StrainDerivativeTensor.zz += Force.z*(Position.z - CenterOfMass.z)*ANGSTRON;
     }
   }
 }
