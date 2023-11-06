@@ -133,9 +133,6 @@ double GetPressureIdealGas(int numberOfMolecules, double volume){
  * Returns    | The excess pressure
  * **************************************************************************************************************/
 double GetPressureExcess(CONFIGURATION Configuration){
-  VECTOR Position, CenterOfMass, Force;
-  double Average;
-  double VolumeMeters = SimulationBox.volume*Cube(ANGSTRON);
   double PressureExcess = 0.0;
 
   if(ReferencePotential == MIE){
@@ -144,18 +141,8 @@ double GetPressureExcess(CONFIGURATION Configuration){
     StrainDerivativeTensor.zx=StrainDerivativeTensor.zy=StrainDerivativeTensor.zz=0.0;
     
     ComputeStrainDerivativeTensor(&Configuration);
-    
-    Average = 0.5*(StrainDerivativeTensor.xy+StrainDerivativeTensor.yx);
-    StrainDerivativeTensor.xy = StrainDerivativeTensor.yx = Average;
-    Average = 0.5*(StrainDerivativeTensor.xz+StrainDerivativeTensor.zx);
-    StrainDerivativeTensor.xz = StrainDerivativeTensor.zx = Average;
-    Average = 0.5*(StrainDerivativeTensor.yz+StrainDerivativeTensor.zy);
-    StrainDerivativeTensor.yz = StrainDerivativeTensor.zy = Average;
 
-    PressureExcess = -1.0*MatrixTrace(StrainDerivativeTensor)/(3.0*VolumeMeters);
-  }else{
-    PressureExcess = 0.0;
+    PressureExcess = -1.0*MatrixTrace(StrainDerivativeTensor);
   }
-  
   return PressureExcess;
 }

@@ -567,6 +567,7 @@ double GetPotentialLongRangeCorrection(CONFIGURATION Configuration) {
 void ComputeStrainDerivativeTensor(CONFIGURATION *Configuration){
   VECTOR Forcejl, Force;
   VECTOR SeparationVectorlj, CenterOfMass, Position;
+  double VolumeMeters = SimulationBox.volume*Cube(ANGSTRON), Average;
 
   for(int i=0; i<Configuration->NumberMolecules; i++){
     for(int j=0; j<Configuration->Molecules[i].Size; j++){
@@ -576,6 +577,7 @@ void ComputeStrainDerivativeTensor(CONFIGURATION *Configuration){
     }
   }
 
+  // atomic contribution
   for(int i=0; i<Configuration->NumberMolecules; i++){
     for(int j=0; j<Configuration->Molecules[i].Size; j++){
       for(int k=i+1; k<Configuration->NumberMolecules; k++){
@@ -597,24 +599,23 @@ void ComputeStrainDerivativeTensor(CONFIGURATION *Configuration){
             Configuration->Molecules[k].Atoms[l].Force, Forcejl
           );
 
-          SeparationVectorlj = MultiplyVectorScalar(SeparationVectorlj, ANGSTRON);
+          StrainDerivativeTensor.xx += Forcejl.x*SeparationVectorlj.x*ANGSTRON;
+          StrainDerivativeTensor.yx += Forcejl.y*SeparationVectorlj.x*ANGSTRON;
+          StrainDerivativeTensor.zx += Forcejl.z*SeparationVectorlj.x*ANGSTRON;
 
-          StrainDerivativeTensor.xx += Forcejl.x*SeparationVectorlj.x;
-          StrainDerivativeTensor.yx += Forcejl.y*SeparationVectorlj.x;
-          StrainDerivativeTensor.zx += Forcejl.z*SeparationVectorlj.x;
+          StrainDerivativeTensor.xy += Forcejl.x*SeparationVectorlj.y*ANGSTRON;
+          StrainDerivativeTensor.yy += Forcejl.y*SeparationVectorlj.y*ANGSTRON;
+          StrainDerivativeTensor.zy += Forcejl.z*SeparationVectorlj.y*ANGSTRON;
 
-          StrainDerivativeTensor.xy += Forcejl.x*SeparationVectorlj.y;
-          StrainDerivativeTensor.yy += Forcejl.y*SeparationVectorlj.y;
-          StrainDerivativeTensor.zy += Forcejl.z*SeparationVectorlj.y;
-
-          StrainDerivativeTensor.xz += Forcejl.x*SeparationVectorlj.z;
-          StrainDerivativeTensor.yz += Forcejl.y*SeparationVectorlj.z;
-          StrainDerivativeTensor.zz += Forcejl.z*SeparationVectorlj.z;
+          StrainDerivativeTensor.xz += Forcejl.x*SeparationVectorlj.z*ANGSTRON;
+          StrainDerivativeTensor.yz += Forcejl.y*SeparationVectorlj.z*ANGSTRON;
+          StrainDerivativeTensor.zz += Forcejl.z*SeparationVectorlj.z*ANGSTRON;
         }
       }
     }
   }
 
+  // molecular correction
   for(int i = 0; i<Configuration->NumberMolecules; i++){
     CenterOfMass = GetMoleculeCenterOfMass(Configuration->Molecules[i]);
     for(int j = 0; j<Configuration->Molecules[i].Size; j++){
@@ -633,4 +634,24 @@ void ComputeStrainDerivativeTensor(CONFIGURATION *Configuration){
       StrainDerivativeTensor.zz += Force.z*(Position.z - CenterOfMass.z)*ANGSTRON;
     }
   }
+
+  StrainDerivativeTensor.xx /= 3*VolumeMeters;
+  StrainDerivativeTensor.yx /= 3*VolumeMeters;
+  StrainDerivativeTensor.zx /= 3*VolumeMeters;
+
+  StrainDerivativeTensor.xy /= 3*VolumeMeters;
+  StrainDerivativeTensor.yy /= 3*VolumeMeters;
+  StrainDerivativeTensor.zy /= 3*VolumeMeters;
+
+  StrainDerivativeTensor.xz /= 3*VolumeMeters;
+  StrainDerivativeTensor.yz /= 3*VolumeMeters;
+  StrainDerivativeTensor.zz /= 3*VolumeMeters;
+
+  Average = 0.5*(StrainDerivativeTensor.xy+StrainDerivativeTensor.yx);
+  StrainDerivativeTensor.xy = StrainDerivativeTensor.yx = Average;
+  Average = 0.5*(StrainDerivativeTensor.xz+StrainDerivativeTensor.zx);
+  StrainDerivativeTensor.xz = StrainDerivativeTensor.zx = Average;
+  Average = 0.5*(StrainDerivativeTensor.yz+StrainDerivativeTensor.zy);
+  StrainDerivativeTensor.yz = StrainDerivativeTensor.zy = Average;
+
 }
