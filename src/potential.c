@@ -103,16 +103,6 @@ double GetPotentialBonded(CONFIGURATION Configuration) {
   
   for(int i=0; i<Configuration.NumberMolecules; ++i) {
     MOLECULE molecule = Configuration.Molecules[i];
-    
-    // // loop for bond stretching energy potential
-    // for(int j=0; j<ChainSize - 1; ++j) {
-    //   ATOM atom1 = molecule.Atoms[j];
-    //   ATOM atom2 = molecule.Atoms[j+1];
-      
-    //   double BondLength = CalculateDistance(atom1.Position, atom2.Position);
-    //   total += GetPotentialStreaching(BondLength);
-    // }
-    
     // loop for molecular bending energy potential
     for(int j=0; j<ChainSize-2; ++j) {
       ATOM atom1 = molecule.Atoms[j];
