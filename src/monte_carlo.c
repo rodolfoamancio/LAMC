@@ -299,34 +299,45 @@ double GenerateInitialConfiguration(CONFIGURATION* Configuration){
   
   AuxConfiguration.Molecules = (MOLECULE*) calloc(Configuration->NumberMolecules, sizeof(MOLECULE));
   
+  xStart = SimulationBox.xMin;
+  yStart = SimulationBox.yMin;
+  zStart = SimulationBox.zMin + Configuration->Molecules[0].Atoms[0].Sigma/2;
+
+  xEnd = SimulationBox.xMax - Configuration->Molecules[0].Atoms[0].Sigma;
+  yEnd = SimulationBox.yMax - Configuration->Molecules[0].Atoms[0].Sigma;
+  zEnd = SimulationBox.zMax - Configuration->Molecules[0].Atoms[0].Sigma/2;
+
+  BasePosition.x = xStart;
+  BasePosition.y = yStart;
+  BasePosition.z = zStart;
+
+  AuxConfiguration.Molecules = (MOLECULE*) calloc(Configuration->NumberMolecules, sizeof(MOLECULE));
   for(int i=0; i<Configuration->NumberMolecules; i++){
-    AuxConfiguration.NumberMolecules = i + 1;
+    AuxConfiguration.NumberMolecules = i+1;
     AuxConfiguration.Molecules[i].Size = Configuration->Molecules[i].Size;
     AuxConfiguration.Molecules[i].MolarMass = Configuration->Molecules[i].MolarMass;
     AuxConfiguration.Molecules[i].Atoms = (ATOM*) calloc(AuxConfiguration.Molecules[i].Size, sizeof(ATOM));
-    for(int j=0; j<AuxConfiguration.Molecules[i].Size; j++)
+
+    for(int j=0; j<AuxConfiguration.Molecules[i].Size; j++) 
       AuxConfiguration.Molecules[i].Atoms[j] = Configuration->Molecules[i].Atoms[j];
 
-    bool FirstBeadPlaced = false;
-    int MaxTrials = 30;
-    while(!FirstBeadPlaced && MaxTrials > 0){
-      AuxConfiguration.Molecules[i].Atoms[0].Position = GetRandomPosition();
-      PartialPotential[0][0] = GetPartialExternalPotential(AuxConfiguration, i, 0);
-      FirstBeadPlaced = !PartialPotential[0][0].overlap;
-      MaxTrials -= 1;
-    }
+    AuxConfiguration.Molecules[i].Atoms[0].Position = BasePosition;
 
     for(int j=1; j<AuxConfiguration.Molecules[i].Size; j++){
       WeightBeadTotal[j]=0;
-      for(int k=0; k<NUMBER_TRIAL_ORIENTATIONS; k++){
-        PositionTrialOrientations[j][k] = SampleBeadPosition(AuxConfiguration.Molecules[i], j);
-        AuxConfiguration.Molecules[i].Atoms[j].Position = PositionTrialOrientations[j][k];
-        PartialPotential[j][k] = GetPartialExternalPotential(AuxConfiguration, i, j);
-        WeightBeadTrials[j][k] = !PartialPotential[j][k].overlap ? exp(-Beta*PartialPotential[j][k].potential) : 0.0;
-        WeightBeadTotal[j] += WeightBeadTrials[j][k];
-      }
       SelectedTrialOrientation = SelectTrialOrientation(WeightBeadTrials[j], WeightBeadTotal[j]);
       AuxConfiguration.Molecules[i].Atoms[j].Position = PositionTrialOrientations[j][SelectedTrialOrientation];    
+    }
+
+    BasePosition.x += CellLength;
+    if(BasePosition.x > xEnd){
+      BasePosition.y += CellLength;
+      BasePosition.x = xStart;
+    }
+
+    if(BasePosition.y > yEnd){
+      BasePosition.z += CellLength;
+      BasePosition.y = yStart;
     }
   }
   CopyConfiguration(AuxConfiguration, Configuration);
