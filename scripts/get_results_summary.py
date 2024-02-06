@@ -152,7 +152,7 @@ def get_properties_summary(filename):
         try:
             beta = 1 / (BOLTZMANN_CONSTANT * production_data["temperature"].mean())
             a1 = (production_data["potential_perturbed"].mean() * beta / production_data["number_molecules"].mean())
-            a2 = (-0.5*production_data["potential_perturbed"].var() * (beta**2) / production_data["number_molecules"].mean())
+            a2 = (-0.5*production_data["potential_perturbed"].var(ddof=0) * (beta**2) / production_data["number_molecules"].mean())
         except:
             pass
 
