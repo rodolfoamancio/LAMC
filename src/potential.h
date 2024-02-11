@@ -51,7 +51,7 @@ VECTOR GetPotentialGradient(VECTOR SeparationVector, ATOM AtomA, ATOM AtomB);
 double GetPotentialSteele(ATOM Atom, double height);
 double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Potential);
 double GetTotalPotentialExternal(CONFIGURATION Configuration);
-double GetPotentialLongRangeCorrection(CONFIGURATION Configuration);
+double GetPotentialLongRangeCorrection(CONFIGURATION Configuration, enum PotentialType Potential);
 void ComputeStrainDerivativeTensor(CONFIGURATION *Configuration);
 
 

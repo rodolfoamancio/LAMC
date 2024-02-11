@@ -465,13 +465,14 @@ double GetTotalPotentialExternal(CONFIGURATION Configuration){
  * Function   | Calculates the long-range correction to the total potential energy between atoms in the system 
  *              using the specified potential field.
  * Parameters | - Configuration: The configuration of the system containing molecules and atoms.
+ *            | - Potential: PotentialType for calculation
  * Returns    | The calculated long-range correction to the total potential energy.
  * **************************************************************************************************************/
-double GetPotentialLongRangeCorrection(CONFIGURATION Configuration) {
+double GetPotentialLongRangeCorrection(CONFIGURATION Configuration, enum PotentialType Potential) {
   double PotentialLongRangeCorrection = 0.0;
   enum CarbonType TypeA, TypeB;
 
-  if (ReferencePotential == MIE) {
+  if (Potential == MIE) {
     int NumberPesudoAtoms[NUMBER_PSEUDO_ATOMS_TYPES] = {0, 0, 0, 0};
     double VolumeCubicMeters = SimulationBox.volume / Cube(METER_TO_ANGSTRON);
     double AuxInteractions = 0;
