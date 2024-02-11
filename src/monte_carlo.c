@@ -260,8 +260,8 @@ double GetRosenbluthWeightGhostMolecule(CONFIGURATION Configuration){
   }
   if(!SimulationBox.ClosedBox){
     DeltaPotentialLongRangeCorrection = (
-      GetPotentialLongRangeCorrection(TestConfiguration) - 
-      GetPotentialLongRangeCorrection(Configuration)
+      GetPotentialLongRangeCorrection(TestConfiguration, ReferencePotential) - 
+      GetPotentialLongRangeCorrection(Configuration, ReferencePotential)
     );
     WeightChain *= exp(-Beta*DeltaPotentialLongRangeCorrection);
   }
@@ -498,8 +498,8 @@ void GetMoleculeInsertion(CONFIGURATION OldConfiguration, CONFIGURATION *NewConf
   if(!SimulationBox.ClosedBox)
     WeightChain *= exp(
       -Beta*(
-        GetPotentialLongRangeCorrection(*NewConfiguration) 
-        - GetPotentialLongRangeCorrection(OldConfiguration)
+        GetPotentialLongRangeCorrection(*NewConfigurationd, ReferencePotential) 
+        - GetPotentialLongRangeCorrection(OldConfiguration, ReferencePotential)
       )
     );
   
@@ -562,8 +562,8 @@ void GetMoleculeDeletion(CONFIGURATION OldConfiguration, CONFIGURATION *NewConfi
   if(!SimulationBox.ClosedBox)
     WeightChain *= exp(
       -Beta*(
-        GetPotentialLongRangeCorrection(*NewConfiguration) 
-        - GetPotentialLongRangeCorrection(OldConfiguration)
+        GetPotentialLongRangeCorrection(*NewConfiguration, ReferencePotential) 
+        - GetPotentialLongRangeCorrection(OldConfiguration, ReferencePotential)
       )
     );
 
@@ -620,7 +620,11 @@ void GetVolumeChange(CONFIGURATION OldConfiguration, CONFIGURATION* NewConfigura
 
   NewBox=OldBox=SimulationBox;
 
-  PotentialOld = GetPotentialNonbonded(OldConfiguration, ReferencePotential)+GetPotentialBonded(OldConfiguration)+GetPotentialLongRangeCorrection(OldConfiguration);
+  PotentialOld = (
+    GetPotentialNonbonded(OldConfiguration, ReferencePotential)
+    + GetPotentialBonded(OldConfiguration)
+    + GetPotentialLongRangeCorrection(OldConfiguration, ReferencePotential)
+  );
   GetCenterOfMassAllMolecules(&OldConfiguration);
 
   NewBox.volume = SimulationBox.volume*exp(GetRandomDoubleInterval(-1, 1)*MaxLnVolumeChange);
@@ -647,7 +651,11 @@ void GetVolumeChange(CONFIGURATION OldConfiguration, CONFIGURATION* NewConfigura
     }
   }
 
-  PotentialNew = GetPotentialNonbonded(*NewConfiguration, ReferencePotential)+GetPotentialBonded(*NewConfiguration)+GetPotentialLongRangeCorrection(*NewConfiguration);
+  PotentialNew = (
+    GetPotentialNonbonded(*NewConfiguration, ReferencePotential)
+    + GetPotentialBonded(*NewConfiguration)
+    + GetPotentialLongRangeCorrection(*NewConfiguration, ReferencePotential)
+  );
   DeltaH = ((PotentialNew - PotentialOld) + 
   SimulationPressure*(NewBox.volume - OldBox.volume)/Cube(METER_TO_ANGSTRON) - 
   ((NewConfiguration->NumberMolecules+1)/Beta)*log(NewBox.volume/OldBox.volume));
