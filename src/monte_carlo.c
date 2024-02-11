@@ -498,7 +498,7 @@ void GetMoleculeInsertion(CONFIGURATION OldConfiguration, CONFIGURATION *NewConf
   if(!SimulationBox.ClosedBox)
     WeightChain *= exp(
       -Beta*(
-        GetPotentialLongRangeCorrection(*NewConfigurationd, ReferencePotential) 
+        GetPotentialLongRangeCorrection(*NewConfiguration, ReferencePotential) 
         - GetPotentialLongRangeCorrection(OldConfiguration, ReferencePotential)
       )
     );
