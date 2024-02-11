@@ -11,17 +11,11 @@
 #include"properties.h"
 
 /* ***************************************************************************************************************
- * Name       | GetPotentialLongRangeCorrection
+ * Name       | GetPressureLongRangeCorrection
  * ---------------------------------------------------------------------------------------------------------------
- * Function   | Calculates the long-range correction to the total 
- *              potential energy between atoms in the system using 
- *              the specified potential field.
- * Parameters |
- *              - Configuration: The configuration of the system
- *                containing molecules and atoms.
- * Returns    | 
- *              The calculated long-range correction to the total 
- *              potential energy.
+ * Function   | Calculates the long-range correction to the total pressure
+ * Parameters | - Configuration: The configuration of the system containing molecules and atoms.
+ * Returns    | The calculated long-range correction to the total potential energy.
  * **************************************************************************************************************/
 double GetPressureLongRangeCorrection(CONFIGURATION Configuration){
   double PressureLongRangeCorrection = 0.0;
