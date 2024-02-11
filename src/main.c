@@ -192,10 +192,13 @@ double RunSimulation(char* InputFileName){
       
       PotentialNonbonded = GetPotentialNonbonded(OldConfiguration, ReferencePotential);
       PotentialBonded = GetPotentialBonded(OldConfiguration);
-      PotentialLongRangeCorrection = GetPotentialLongRangeCorrection(OldConfiguration);
+      PotentialLongRangeCorrection = GetPotentialLongRangeCorrection(OldConfiguration, ReferencePotential);
       PotentialWalls = GetTotalPotentialExternal(OldConfiguration);
       
-      PotentialPerturbed = GetPotentialNonbonded(OldConfiguration, PerturbationPotential);
+      PotentialPerturbed = (
+        GetPotentialNonbonded(OldConfiguration, PerturbationPotential)
+        + GetPotentialLongRangeCorrection(OldConfiguration, PerturbationPotential)
+      );
       PotentialTotal = PotentialNonbonded + PotentialBonded + PotentialLongRangeCorrection + PotentialWalls;
 
       fprintf(
