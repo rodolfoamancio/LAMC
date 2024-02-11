@@ -156,7 +156,7 @@ def get_properties_summary(filename):
             n = production_data.number_molecules.mean()
 
             a1 = (beta/n)*pert_mean
-            a1 = (-0.5*(beta**2)/n)*pert_var
+            a2 = (-0.5*(beta**2)/n)*pert_var
         except:
             pass
 
