@@ -230,7 +230,7 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
         );
         if((ReferencePotential == HARD_SPHERE) && (Distance < sigma)){
           PartialPotential.overlap = true;
-          PartialPotential.potential = 1E30;
+          PartialPotential.potential = 1E6;
           return PartialPotential;
         }else if((ReferencePotential == MIE) && (Distance < CUTOFF_DISTANCE)){
           epsilon = GetEpsilonCombination(
@@ -408,7 +408,7 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
           Distance = Norm(SeparationVector);
           sigma = GetSigmaCombination(Configuration.Molecules[i].Atoms[j].Sigma, Configuration.Molecules[k].Atoms[l].Sigma);
 
-          if (Potential == MIE && Distance < CUTOFF_DISTANCE){
+          if ((Potential == MIE) && (Distance < CUTOFF_DISTANCE)){
             epsilon = GetEpsilonCombination(
               Configuration.Molecules[i].Atoms[j].Epsilon, 
               Configuration.Molecules[k].Atoms[l].Epsilon
@@ -430,7 +430,7 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
             );
             Sum += potential;
             if(Beta*potential > 1000) return 1E6;
-          }else if (Potential == HARD_SPHERE && Distance < sigma){
+          }else if ((Potential == HARD_SPHERE) && (Distance < sigma)){
             return 1E6;
           }
         }
@@ -474,7 +474,7 @@ double GetPotentialLongRangeCorrection(CONFIGURATION Configuration, enum Potenti
 
   if (Potential == MIE) {
     int NumberPesudoAtoms[NUMBER_PSEUDO_ATOMS_TYPES] = {0, 0, 0, 0};
-    double VolumeCubicMeters = SimulationBox.volume / Cube(METER_TO_ANGSTRON);
+    // double VolumeCubicMeters = SimulationBox.volume / Cube(METER_TO_ANGSTRON);
     double AuxInteractions = 0;
 
     for (int i = 0; i < Configuration.NumberMolecules; i++) {
@@ -501,47 +501,54 @@ double GetPotentialLongRangeCorrection(CONFIGURATION Configuration, enum Potenti
 
     for (int i = 0; i < NUMBER_PSEUDO_ATOMS_TYPES; i++) {
       for (int j = i; j < NUMBER_PSEUDO_ATOMS_TYPES; j++) {
-        if(i == 0){
-          TypeA = CH4;
-        }else if(i == 1){
-          TypeA = CH3e;
-        }else if(i == 2){
-          TypeA = CH3;
-        }else{
-          TypeA = CH2;
-        }
+        if(NumberPesudoAtoms[i]*NumberPesudoAtoms[j] > 0){
+          if(i == 0){
+            TypeA = CH4;
+          }else if(i == 1){
+            TypeA = CH3e;
+          }else if(i == 2){
+            TypeA = CH3;
+          }else{
+            TypeA = CH2;
+          }
 
-        if(j == 0){
-          TypeB = CH4;
-        }else if(j == 1){
-          TypeB = CH3e;
-        }else if(j == 2){
-          TypeB = CH3;
-        }else{
-          TypeB = CH2;
-        }
+          if(j == 0){
+            TypeB = CH4;
+          }else if(j == 1){
+            TypeB = CH3e;
+          }else if(j == 2){
+            TypeB = CH3;
+          }else{
+            TypeB = CH2;
+          }
 
-        double Sigma = GetSigmaCombination(GetAlkaneSigma(TypeA), GetAlkaneSigma(TypeB));
-        double Epsilon = GetEpsilonCombination(GetAlkaneEpsilon(TypeA), GetAlkaneEpsilon(TypeB));
-        double RepulsiveExponent = GetExponentCombination(GetAlkaneRepulsiveExponent(TypeA), GetAlkaneRepulsiveExponent(TypeB));
-        double AttractiveExponent = GetExponentCombination(GetAlkaneAttractiveExponent(TypeA), GetAlkaneAttractiveExponent(TypeB));
-        double C = GetCMie(RepulsiveExponent, AttractiveExponent);
-        double SigmaCutoffN = pow(Sigma/CUTOFF_DISTANCE, RepulsiveExponent);
-        double SigmaCutoffM = pow(Sigma/CUTOFF_DISTANCE, AttractiveExponent);
-        AuxInteractions += (
-          NumberPesudoAtoms[i]
-          *NumberPesudoAtoms[j]
-          *Epsilon
-          *C
-          *(
-            (1.0/(3 - RepulsiveExponent))*SigmaCutoffN
-            -(1.0/(3 - AttractiveExponent))*SigmaCutoffM
-          )
-        );
+          double Sigma = GetSigmaCombination(GetAlkaneSigma(TypeA), GetAlkaneSigma(TypeB));
+          double Epsilon = GetEpsilonCombination(GetAlkaneEpsilon(TypeA), GetAlkaneEpsilon(TypeB));
+          double RepulsiveExponent = GetExponentCombination(GetAlkaneRepulsiveExponent(TypeA), GetAlkaneRepulsiveExponent(TypeB));
+          double AttractiveExponent = GetExponentCombination(GetAlkaneAttractiveExponent(TypeA), GetAlkaneAttractiveExponent(TypeB));
+          double C = GetCMie(RepulsiveExponent, AttractiveExponent);
+          double SigmaCutoffN = pow(Sigma/CUTOFF_DISTANCE, RepulsiveExponent);
+          double SigmaCutoffM = pow(Sigma/CUTOFF_DISTANCE, AttractiveExponent);
+
+          AuxInteractions += (
+            -2
+            *M_PI
+            *NumberPesudoAtoms[i]
+            *NumberPesudoAtoms[j]
+            *Epsilon
+            *C
+            *Cube(CUTOFF_DISTANCE)
+            *(
+              ((1.0/(3.0 - RepulsiveExponent))*SigmaCutoffN)
+              -((1.0/(3.0 - AttractiveExponent))*SigmaCutoffM)
+            )
+            /SimulationBox.volume
+          );
+        }
       }
     }
 
-    PotentialLongRangeCorrection = -2.0*M_PI*AuxInteractions*Cube(CUTOFF_DISTANCE*ANGSTRON)/VolumeCubicMeters;
+    PotentialLongRangeCorrection = AuxInteractions;
   }
   
   return PotentialLongRangeCorrection;
