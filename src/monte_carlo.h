@@ -23,7 +23,7 @@
 #include"structural.h"
 #include"simulation_setup.h"
 
-#define NUMBER_TRIAL_ORIENTATIONS 40
+#define NUMBER_TRIAL_ORIENTATIONS 30
 
 enum ensemble {NVT, NPT, muVT};
 extern enum ensemble SimulationEnsemble;
