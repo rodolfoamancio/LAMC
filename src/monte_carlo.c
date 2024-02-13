@@ -286,26 +286,17 @@ double GenerateInitialConfiguration(CONFIGURATION* Configuration){
   double WeightBeadTrials[MAX_CHAIN_SIZE][NUMBER_TRIAL_ORIENTATIONS]={0};
   double WeightBeadTotal[MAX_CHAIN_SIZE]={0};
   double CellLength;
-  double BondLength;
   double xSize, ySize, zSize;
-  double xStart, xEnd, yStart, yEnd, zStart, zEnd;
+  double xStart, yStart, zStart;
   int SelectedTrialOrientation;
 
-  xSize = SimulationBox.xSize - Configuration->Molecules[0].Atoms[0].Sigma;
-  ySize = SimulationBox.ySize - Configuration->Molecules[0].Atoms[0].Sigma;
-  zSize = SimulationBox.zSize - Configuration->Molecules[0].Atoms[0].Sigma;
-
-  CellLength = cbrt(xSize*ySize*zSize/Configuration->NumberMolecules);
+  CellLength = cbrt(SimulationBox.xSize*SimulationBox.ySize*SimulationBox.zSize/Configuration->NumberMolecules);
   
   AuxConfiguration.Molecules = (MOLECULE*) calloc(Configuration->NumberMolecules, sizeof(MOLECULE));
   
-  xStart = SimulationBox.xMin;
-  yStart = SimulationBox.yMin;
+  xStart = SimulationBox.xMin + Configuration->Molecules[0].Atoms[0].Sigma/2;
+  yStart = SimulationBox.yMin + Configuration->Molecules[0].Atoms[0].Sigma/2;
   zStart = SimulationBox.zMin + Configuration->Molecules[0].Atoms[0].Sigma/2;
-
-  xEnd = SimulationBox.xMax - Configuration->Molecules[0].Atoms[0].Sigma;
-  yEnd = SimulationBox.yMax - Configuration->Molecules[0].Atoms[0].Sigma;
-  zEnd = SimulationBox.zMax - Configuration->Molecules[0].Atoms[0].Sigma/2;
 
   BasePosition.x = xStart;
   BasePosition.y = yStart;
@@ -325,17 +316,26 @@ double GenerateInitialConfiguration(CONFIGURATION* Configuration){
 
     for(int j=1; j<AuxConfiguration.Molecules[i].Size; j++){
       WeightBeadTotal[j]=0;
+      for(int k=0; k<NUMBER_TRIAL_ORIENTATIONS; k++){
+        PositionTrialOrientations[j][k] = SampleBeadPosition(AuxConfiguration.Molecules[i], j);
+        AuxConfiguration.Molecules[i].Atoms[j].Position = PositionTrialOrientations[j][k];
+        PartialPotential[j][k] = GetPartialExternalPotential(AuxConfiguration, i, j);
+        WeightBeadTrials[j][k] = (
+          !PartialPotential[j][k].overlap ? exp(-PartialPotential[j][k].potential*Beta) : 0.0
+        );
+        WeightBeadTotal[j] += WeightBeadTrials[j][k];
+      }
       SelectedTrialOrientation = SelectTrialOrientation(WeightBeadTrials[j], WeightBeadTotal[j]);
       AuxConfiguration.Molecules[i].Atoms[j].Position = PositionTrialOrientations[j][SelectedTrialOrientation];    
     }
 
     BasePosition.x += CellLength;
-    if(BasePosition.x > xEnd){
+    if(BasePosition.x >= SimulationBox.xMax){
       BasePosition.y += CellLength;
       BasePosition.x = xStart;
     }
 
-    if(BasePosition.y > yEnd){
+    if(BasePosition.y >= SimulationBox.yMax){
       BasePosition.z += CellLength;
       BasePosition.y = yStart;
     }
