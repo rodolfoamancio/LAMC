@@ -254,7 +254,7 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
           );
           if(Beta*potential > 10){
             PartialPotential.overlap = true;
-            PartialPotential.potential = 1E30;
+            PartialPotential.potential = 1E6;
             return PartialPotential;
           }
           PartialPotential.potential += potential;
