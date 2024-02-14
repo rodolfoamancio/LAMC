@@ -1,7 +1,9 @@
 *.o
 *.exe
-*.out
+*.out*
 *.csv
+*.inp
+*.pbs
 data/andre.tar.xz
 data/andre/C1/C1_muVT_andre.inp
 data/andre/C1/C1_muVT_andre.pbs
