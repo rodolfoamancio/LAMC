@@ -57,6 +57,43 @@ double GetPotentialMie(
     return C*Epsilon*(SigmaDistanceN - SigmaDistanceM);
 }
 
+double GetBHPotentialReference(
+  double RepulsiveExponent, 
+  double AttractiveExponent, 
+  double Sigma, 
+  double Epsilon, 
+  double Distance){
+    if(Distance <= Sigma){
+      return GetPotentialMie(
+        RepulsiveExponent,
+        AttractiveExponent,
+        Sigma,
+        Epsilon,
+        Distance
+      );
+    }else{
+      return 0;
+    }
+}
+
+double GetBHPotentialPerturbed(
+  double RepulsiveExponent, 
+  double AttractiveExponent, 
+  double Sigma, 
+  double Epsilon, 
+  double Distance){
+    if(Distance > Sigma){
+      return GetPotentialMie(
+        RepulsiveExponent,
+        AttractiveExponent,
+        Sigma,
+        Epsilon,
+        Distance
+      );
+    }else{
+      return 0;
+    }
+}
 
 /* ***************************************************************************************************************
  * Name       | GetPotentialStretching
