@@ -269,7 +269,7 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
           PartialPotential.overlap = true;
           PartialPotential.potential = 1E6;
           return PartialPotential;
-        }else if((ReferencePotential == MIE) && (Distance < CUTOFF_DISTANCE)){
+        }else if(Distance < CUTOFF_DISTANCE){
           epsilon = GetEpsilonCombination(
               Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].Epsilon, 
               Configuration.Molecules[i].Atoms[j].Epsilon
@@ -282,13 +282,23 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
             Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].AttractiveExponent, 
             Configuration.Molecules[i].Atoms[j].AttractiveExponent
           );
-          potential = GetPotentialMie(
-            RepulsiveExponent,
-            AttractiveExponent,
-            sigma,
-            epsilon,
-            Distance
-          );
+          if(ReferencePotential == MIE){
+            potential = GetPotentialMie(
+              RepulsiveExponent,
+              AttractiveExponent,
+              sigma,
+              epsilon,
+              Distance
+            );
+          }else if(ReferencePotential == BARKER_HENDERSON_REFERENCE){
+            potential = GetBHPotentialReference(
+              RepulsiveExponent,
+              AttractiveExponent,
+              sigma,
+              epsilon,
+              Distance
+            );
+          }
           if(Beta*potential > 10){
             PartialPotential.overlap = true;
             PartialPotential.potential = 1E6;
