@@ -468,13 +468,32 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
               Configuration.Molecules[i].Atoms[j].AttractiveExponent, 
               Configuration.Molecules[k].Atoms[l].AttractiveExponent
             );
-            potential = GetPotentialMie(
-              RepulsiveExponent,
-              AttractiveExponent,
-              sigma,
-              epsilon,
-              Distance
-            );
+            if(Potential == MIE){
+              potential = GetPotentialMie(
+                RepulsiveExponent,
+                AttractiveExponent,
+                sigma,
+                epsilon,
+                Distance
+              );
+            }else if(Potential == BARKER_HENDERSON_REFERENCE){
+              potential = GetBHPotentialReference(
+                RepulsiveExponent,
+                AttractiveExponent,
+                sigma,
+                epsilon,
+                Distance
+              );
+            }else if(Potential == BARKER_HENDERSON_PERTURBED){
+              potential = GetBHPotentialPerturbed(
+                RepulsiveExponent,
+                AttractiveExponent,
+                sigma,
+                epsilon,
+                Distance
+              );
+            }
+            
             Sum += potential;
             if(Beta*potential > 1000) return 1E6;
           }else if ((Potential == HARD_SPHERE) && (Distance < sigma)){
