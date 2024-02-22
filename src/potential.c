@@ -538,7 +538,7 @@ double GetPotentialLongRangeCorrection(CONFIGURATION Configuration, enum Potenti
   double PotentialLongRangeCorrection = 0.0;
   enum CarbonType TypeA, TypeB;
 
-  if (Potential == MIE && !SimulationBox.ClosedBox) {
+  if ((Potential == MIE || Potential == BARKER_HENDERSON_PERTURBED) && !SimulationBox.ClosedBox) {
     int NumberPesudoAtoms[NUMBER_PSEUDO_ATOMS_TYPES] = {0, 0, 0, 0};
     // double VolumeCubicMeters = SimulationBox.volume / Cube(METER_TO_ANGSTRON);
     double AuxInteractions = 0;
