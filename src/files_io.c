@@ -43,8 +43,10 @@ char* GetPotentialTypeLabel(enum PotentialType Potential){
    return "Mie";
   }else if(Potential==HARD_SPHERE){
    return "Hard-sphere";
-  }else if(Potential==BARKER_HENDERSON_REFERENCE || Potential==BARKER_HENDERSON_PERTURBED){
-   return "Barker-Henderson";
+  }else if(Potential==BARKER_HENDERSON_REFERENCE){
+   return "Barker-Henderson reference";
+  }else if(Potential==BARKER_HENDERSON_PERTURBED){
+   return "Barker-Henderson perturbed";
   }
 }
 
