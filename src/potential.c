@@ -269,7 +269,7 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
           PartialPotential.overlap = true;
           PartialPotential.potential = 1E6;
           return PartialPotential;
-        }else if((ReferencePotential == MIE) && (Distance < CUTOFF_DISTANCE)){
+        }else if(Distance < CUTOFF_DISTANCE){
           epsilon = GetEpsilonCombination(
               Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].Epsilon, 
               Configuration.Molecules[i].Atoms[j].Epsilon
@@ -282,13 +282,23 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
             Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].AttractiveExponent, 
             Configuration.Molecules[i].Atoms[j].AttractiveExponent
           );
-          potential = GetPotentialMie(
-            RepulsiveExponent,
-            AttractiveExponent,
-            sigma,
-            epsilon,
-            Distance
-          );
+          if(ReferencePotential == MIE){
+            potential = GetPotentialMie(
+              RepulsiveExponent,
+              AttractiveExponent,
+              sigma,
+              epsilon,
+              Distance
+            );
+          }else if(ReferencePotential == BARKER_HENDERSON_REFERENCE){
+            potential = GetBHPotentialReference(
+              RepulsiveExponent,
+              AttractiveExponent,
+              sigma,
+              epsilon,
+              Distance
+            );
+          }
           if(Beta*potential > 10){
             PartialPotential.overlap = true;
             PartialPotential.potential = 1E6;
@@ -445,7 +455,9 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
           Distance = Norm(SeparationVector);
           sigma = GetSigmaCombination(Configuration.Molecules[i].Atoms[j].Sigma, Configuration.Molecules[k].Atoms[l].Sigma);
 
-          if ((Potential == MIE) && (Distance < CUTOFF_DISTANCE)){
+          if(Potential == HARD_SPHERE && Distance < sigma){
+            return 1E6;
+          }else if(Distance < CUTOFF_DISTANCE){
             epsilon = GetEpsilonCombination(
               Configuration.Molecules[i].Atoms[j].Epsilon, 
               Configuration.Molecules[k].Atoms[l].Epsilon
@@ -458,17 +470,31 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
               Configuration.Molecules[i].Atoms[j].AttractiveExponent, 
               Configuration.Molecules[k].Atoms[l].AttractiveExponent
             );
-            potential = GetPotentialMie(
-              RepulsiveExponent,
-              AttractiveExponent,
-              sigma,
-              epsilon,
-              Distance
-            );
-            Sum += potential;
-            if(Beta*potential > 1000) return 1E6;
-          }else if ((Potential == HARD_SPHERE) && (Distance < sigma)){
-            return 1E6;
+            if(Potential == BARKER_HENDERSON_REFERENCE){
+              Sum += GetBHPotentialReference(
+                RepulsiveExponent,
+                AttractiveExponent,
+                sigma,
+                epsilon,
+                Distance
+              );
+            }else if(Potential == BARKER_HENDERSON_PERTURBED){
+              Sum += GetBHPotentialPerturbed(
+                RepulsiveExponent,
+                AttractiveExponent,
+                sigma,
+                epsilon,
+                Distance
+              );
+            }else if(Potential == MIE){
+              Sum += GetPotentialMie(
+                RepulsiveExponent,
+                AttractiveExponent,
+                sigma,
+                epsilon,
+                Distance
+              );
+            }
           }
         }
       }
@@ -509,7 +535,7 @@ double GetPotentialLongRangeCorrection(CONFIGURATION Configuration, enum Potenti
   double PotentialLongRangeCorrection = 0.0;
   enum CarbonType TypeA, TypeB;
 
-  if (Potential == MIE && !SimulationBox.ClosedBox) {
+  if ((Potential == MIE || Potential == BARKER_HENDERSON_PERTURBED) && !SimulationBox.ClosedBox) {
     int NumberPesudoAtoms[NUMBER_PSEUDO_ATOMS_TYPES] = {0, 0, 0, 0};
     // double VolumeCubicMeters = SimulationBox.volume / Cube(METER_TO_ANGSTRON);
     double AuxInteractions = 0;

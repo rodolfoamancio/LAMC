@@ -43,6 +43,10 @@ char* GetPotentialTypeLabel(enum PotentialType Potential){
    return "Mie";
   }else if(Potential==HARD_SPHERE){
    return "Hard-sphere";
+  }else if(Potential==BARKER_HENDERSON_REFERENCE){
+   return "Barker-Henderson reference";
+  }else if(Potential==BARKER_HENDERSON_PERTURBED){
+   return "Barker-Henderson perturbed";
   }
 }
 
@@ -155,6 +159,13 @@ void ReadInputFile(char inputsFilePath[]){
      ReferencePotential = MIE;
     }else if(strcmp(InputData, "HARD_SPHERE")==0){
      ReferencePotential = HARD_SPHERE;
+    }else if(
+      strcmp(InputData, "BARKER_HENDERSON_REFERENCE")==0
+      || strcmp(InputData, "BARKER_HENDERSON")==0
+    ){
+     ReferencePotential = BARKER_HENDERSON_REFERENCE;
+    }else{
+     printf("Reference potential not recognized\n");
     }
 
    }else if(strcmp(InputName, "PERTURBED_POTENTIAL")==0){
@@ -162,6 +173,13 @@ void ReadInputFile(char inputsFilePath[]){
      PerturbationPotential = MIE;
     }else if(strcmp(InputData, "HARD_SPHERE")==0){
      PerturbationPotential = HARD_SPHERE;
+    }else if(
+      strcmp(InputData, "BARKER_HENDERSON_PERTURBED")==0
+      || strcmp(InputData, "BARKER_HENDERSON")==0
+    ){
+     PerturbationPotential = BARKER_HENDERSON_PERTURBED;
+    }else{
+      printf("Pertubed potential not recognized\n");
     }
 
    }else if(strcmp(InputName, "NUMBER_EQUILIBRATION_CYCLES")==0){

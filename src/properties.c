@@ -20,7 +20,7 @@
 double GetPressureLongRangeCorrection(CONFIGURATION Configuration){
   double PressureLongRangeCorrection = 0.0;
   enum CarbonType TypeA, TypeB;
-  if (ReferencePotential == MIE) {
+  if ((ReferencePotential == MIE || ReferencePotential == BARKER_HENDERSON_PERTURBED)) {
     int NumberPesudoAtoms[NUMBER_PSEUDO_ATOMS_TYPES] = {0, 0, 0, 0};
     double VolumeCubicMeters = SimulationBox.volume / Cube(METER_TO_ANGSTRON);
     double AuxInteractions = 0;
@@ -129,7 +129,7 @@ double GetPressureIdealGas(int numberOfMolecules, double volume){
 double GetPressureExcess(CONFIGURATION Configuration){
   double PressureExcess = 0.0;
 
-  if(ReferencePotential == MIE){
+  if(ReferencePotential == MIE || ReferencePotential == BARKER_HENDERSON_PERTURBED){
     StrainDerivativeTensor.xx=StrainDerivativeTensor.xy=StrainDerivativeTensor.xz=0.0;
     StrainDerivativeTensor.yx=StrainDerivativeTensor.yy=StrainDerivativeTensor.yz=0.0;
     StrainDerivativeTensor.zx=StrainDerivativeTensor.zy=StrainDerivativeTensor.zz=0.0;
