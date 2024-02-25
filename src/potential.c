@@ -455,7 +455,9 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
           Distance = Norm(SeparationVector);
           sigma = GetSigmaCombination(Configuration.Molecules[i].Atoms[j].Sigma, Configuration.Molecules[k].Atoms[l].Sigma);
 
-          if ((Potential == MIE) && (Distance < CUTOFF_DISTANCE)){
+          if(Potential == HARD_SPHERE && Distance < sigma){
+            return 1E6;
+          }else if(Distance < CUTOFF_DISTANCE){
             epsilon = GetEpsilonCombination(
               Configuration.Molecules[i].Atoms[j].Epsilon, 
               Configuration.Molecules[k].Atoms[l].Epsilon
@@ -468,16 +470,8 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
               Configuration.Molecules[i].Atoms[j].AttractiveExponent, 
               Configuration.Molecules[k].Atoms[l].AttractiveExponent
             );
-            if(Potential == MIE){
-              potential = GetPotentialMie(
-                RepulsiveExponent,
-                AttractiveExponent,
-                sigma,
-                epsilon,
-                Distance
-              );
-            }else if(Potential == BARKER_HENDERSON_REFERENCE){
-              potential = GetBHPotentialReference(
+            if(Potential == BARKER_HENDERSON_REFERENCE){
+              Sum += GetBHPotentialReference(
                 RepulsiveExponent,
                 AttractiveExponent,
                 sigma,
@@ -485,7 +479,15 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
                 Distance
               );
             }else if(Potential == BARKER_HENDERSON_PERTURBED){
-              potential = GetBHPotentialPerturbed(
+              Sum += GetBHPotentialPerturbed(
+                RepulsiveExponent,
+                AttractiveExponent,
+                sigma,
+                epsilon,
+                Distance
+              );
+            }else if(Potential == MIE){
+              Sum += GetPotentialMie(
                 RepulsiveExponent,
                 AttractiveExponent,
                 sigma,
@@ -493,11 +495,6 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
                 Distance
               );
             }
-            
-            Sum += potential;
-            if(Beta*potential > 1000) return 1E6;
-          }else if ((Potential == HARD_SPHERE) && (Distance < sigma)){
-            return 1E6;
           }
         }
       }
