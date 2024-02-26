@@ -381,23 +381,14 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
             Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].AttractiveExponent, 
             Configuration.Molecules[i].Atoms[j].AttractiveExponent
           );
-          if(ReferencePotential == MIE){
-            potential = GetPotentialMie(
-              RepulsiveExponent,
+          potential = GetNonbondedPotentialPair(
+            RepulsiveExponent,
               AttractiveExponent,
               sigma,
               epsilon,
-              Distance
-            );
-          }else if(ReferencePotential == BARKER_HENDERSON_REFERENCE){
-            potential = GetBHPotentialReference(
-              RepulsiveExponent,
-              AttractiveExponent,
-              sigma,
-              epsilon,
-              Distance
-            );
-          }
+              Distance,
+              ReferencePotential
+          );
           if(Beta*potential > 10){
             PartialPotential.overlap = true;
             PartialPotential.potential = 1E6;
@@ -569,31 +560,14 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
               Configuration.Molecules[i].Atoms[j].AttractiveExponent, 
               Configuration.Molecules[k].Atoms[l].AttractiveExponent
             );
-            if(Potential == BARKER_HENDERSON_REFERENCE){
-              Sum += GetBHPotentialReference(
-                RepulsiveExponent,
-                AttractiveExponent,
-                sigma,
-                epsilon,
-                Distance
-              );
-            }else if(Potential == BARKER_HENDERSON_PERTURBED){
-              Sum += GetBHPotentialPerturbed(
-                RepulsiveExponent,
-                AttractiveExponent,
-                sigma,
-                epsilon,
-                Distance
-              );
-            }else if(Potential == MIE){
-              Sum += GetPotentialMie(
-                RepulsiveExponent,
-                AttractiveExponent,
-                sigma,
-                epsilon,
-                Distance
-              );
-            }
+            Sum += GetNonbondedPotentialPair(
+              RepulsiveExponent,
+              AttractiveExponent,
+              sigma,
+              epsilon,
+              Distance,
+              Potential
+            );
           }
         }
       }
