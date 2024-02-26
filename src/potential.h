@@ -26,7 +26,14 @@ typedef struct{
 	bool   overlap;
 } POTENTIAL;
 
-enum PotentialType {MIE, HARD_SPHERE, BARKER_HENDERSON_REFERENCE, BARKER_HENDERSON_PERTURBED};
+enum PotentialType {
+  MIE, 
+  HARD_SPHERE, 
+  BARKER_HENDERSON_REFERENCE, 
+  BARKER_HENDERSON_PERTURBED, 
+  WEEKS_CHANDER_ANDERSER_REFERENCE, 
+  WEEKS_CHANDER_ANDERSER_PERTURBED
+};
 extern enum PotentialType ReferencePotential, PerturbationPotential;
 
 double GetCMie(double RepulsiveExponent, double AttractiveExponent);
