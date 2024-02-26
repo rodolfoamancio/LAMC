@@ -55,6 +55,25 @@ double GetBHPotentialPerturbed(
   double Sigma, 
   double Epsilon, 
   double Distance);
+double GetWCAPotentialReference(
+  double RepulsiveExponent, 
+  double AttractiveExponent, 
+  double Sigma, 
+  double Epsilon, 
+  double Distance);
+double GetWCAPotentialPerturbed(
+  double RepulsiveExponent, 
+  double AttractiveExponent, 
+  double Sigma, 
+  double Epsilon, 
+  double Distance);
+double GetNonbondedPotentialPair(
+  double RepulsiveExponent, 
+  double AttractiveExponent, 
+  double Sigma, 
+  double Epsilon, 
+  double Distance,
+  enum PotentialType Potential);
 double GetPotentialStreaching(double d);
 double GetPotentialBending(double theta);
 double GetPotentialTorsion(double phi);

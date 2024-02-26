@@ -95,6 +95,105 @@ double GetBHPotentialPerturbed(
     }
 }
 
+double GetWCAPotentialReference(
+  double RepulsiveExponent, 
+  double AttractiveExponent, 
+  double Sigma, 
+  double Epsilon, 
+  double Distance){
+    if(Distance < pow(2, 1.0/6.0)*Sigma){
+      return GetPotentialMie(
+        RepulsiveExponent,
+        AttractiveExponent,
+        Sigma,
+        Epsilon,
+        Distance
+      ) + Epsilon;
+    }else{
+      return 0;
+    }
+}
+
+double GetWCAPotentialPerturbed(
+  double RepulsiveExponent, 
+  double AttractiveExponent, 
+  double Sigma, 
+  double Epsilon, 
+  double Distance){
+    if(Distance >= pow(2, 1.0/6.0)*Sigma){
+      return GetPotentialMie(
+        RepulsiveExponent,
+        AttractiveExponent,
+        Sigma,
+        Epsilon,
+        Distance
+      );
+    }else{
+      return -Epsilon;
+    }
+}
+
+double GetNonbondedPotentialPair(
+  double RepulsiveExponent, 
+  double AttractiveExponent, 
+  double Sigma, 
+  double Epsilon, 
+  double Distance,
+  enum PotentialType Potential){
+  switch (Potential){
+    case MIE:
+      return GetPotentialMie(
+        RepulsiveExponent,
+        AttractiveExponent,
+        Sigma,
+        Epsilon,
+        Distance
+      );
+
+    case BARKER_HENDERSON_REFERENCE:
+      return GetBHPotentialReference(
+        RepulsiveExponent,
+        AttractiveExponent,
+        Sigma,
+        Epsilon,
+        Distance
+      );
+
+    case BARKER_HENDERSON_PERTURBED:
+      return GetBHPotentialPerturbed(
+        RepulsiveExponent,
+        AttractiveExponent,
+        Sigma,
+        Epsilon,
+        Distance
+      );
+
+    case WEEKS_CHANDER_ANDERSER_REFERENCE:
+      return GetWCAPotentialReference(
+        RepulsiveExponent,
+        AttractiveExponent,
+        Sigma,
+        Epsilon,
+        Distance
+      );
+
+    case WEEKS_CHANDER_ANDERSER_PERTURBED:
+      return GetWCAPotentialPerturbed(
+        RepulsiveExponent,
+        AttractiveExponent,
+        Sigma,
+        Epsilon,
+        Distance
+      );
+
+    case HARD_SPHERE:
+      return (Distance < Sigma) ? 1E6 : 0.0;
+
+    default:
+      return 0.0;
+  }
+}
+
 /* ***************************************************************************************************************
  * Name       | GetPotentialStretching
  * ---------------------------------------------------------------------------------------------------------------
