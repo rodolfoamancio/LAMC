@@ -168,7 +168,7 @@ double GetNonbondedPotentialPair(
         Distance
       );
 
-    case WEEKS_CHANDER_ANDERSER_REFERENCE:
+    case WEEKS_CHANDLER_ANDERSEN_REFERENCE:
       return GetWCAPotentialReference(
         RepulsiveExponent,
         AttractiveExponent,
@@ -177,7 +177,7 @@ double GetNonbondedPotentialPair(
         Distance
       );
 
-    case WEEKS_CHANDER_ANDERSER_PERTURBED:
+    case WEEKS_CHANDLER_ANDERSEN_PERTURBED:
       return GetWCAPotentialPerturbed(
         RepulsiveExponent,
         AttractiveExponent,
