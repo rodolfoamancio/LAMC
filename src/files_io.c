@@ -56,7 +56,7 @@ char* GetPotentialTypeLabel(enum PotentialType Potential){
       return "Weeks-Chandler-Andersen reference";
 
     case WEEKS_CHANDLER_ANDERSEN_PERTURBED:
-      return "Weeks-Chandler-Andersen perturbed":
+      return "Weeks-Chandler-Andersen perturbed";
 
     default:
       return "Invalid potential";
