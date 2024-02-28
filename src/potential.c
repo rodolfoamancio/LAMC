@@ -95,6 +95,105 @@ double GetBHPotentialPerturbed(
     }
 }
 
+double GetWCAPotentialReference(
+  double RepulsiveExponent, 
+  double AttractiveExponent, 
+  double Sigma, 
+  double Epsilon, 
+  double Distance){
+    if(Distance < pow(2, 1.0/6.0)*Sigma){
+      return GetPotentialMie(
+        RepulsiveExponent,
+        AttractiveExponent,
+        Sigma,
+        Epsilon,
+        Distance
+      ) + Epsilon;
+    }else{
+      return 0;
+    }
+}
+
+double GetWCAPotentialPerturbed(
+  double RepulsiveExponent, 
+  double AttractiveExponent, 
+  double Sigma, 
+  double Epsilon, 
+  double Distance){
+    if(Distance >= pow(2, 1.0/6.0)*Sigma){
+      return GetPotentialMie(
+        RepulsiveExponent,
+        AttractiveExponent,
+        Sigma,
+        Epsilon,
+        Distance
+      );
+    }else{
+      return -Epsilon;
+    }
+}
+
+double GetNonbondedPotentialPair(
+  double RepulsiveExponent, 
+  double AttractiveExponent, 
+  double Sigma, 
+  double Epsilon, 
+  double Distance,
+  enum PotentialType Potential){
+  switch (Potential){
+    case MIE:
+      return GetPotentialMie(
+        RepulsiveExponent,
+        AttractiveExponent,
+        Sigma,
+        Epsilon,
+        Distance
+      );
+
+    case BARKER_HENDERSON_REFERENCE:
+      return GetBHPotentialReference(
+        RepulsiveExponent,
+        AttractiveExponent,
+        Sigma,
+        Epsilon,
+        Distance
+      );
+
+    case BARKER_HENDERSON_PERTURBED:
+      return GetBHPotentialPerturbed(
+        RepulsiveExponent,
+        AttractiveExponent,
+        Sigma,
+        Epsilon,
+        Distance
+      );
+
+    case WEEKS_CHANDLER_ANDERSEN_REFERENCE:
+      return GetWCAPotentialReference(
+        RepulsiveExponent,
+        AttractiveExponent,
+        Sigma,
+        Epsilon,
+        Distance
+      );
+
+    case WEEKS_CHANDLER_ANDERSEN_PERTURBED:
+      return GetWCAPotentialPerturbed(
+        RepulsiveExponent,
+        AttractiveExponent,
+        Sigma,
+        Epsilon,
+        Distance
+      );
+
+    case HARD_SPHERE:
+      return (Distance < Sigma) ? 1E6 : 0.0;
+
+    default:
+      return 0.0;
+  }
+}
+
 /* ***************************************************************************************************************
  * Name       | GetPotentialStretching
  * ---------------------------------------------------------------------------------------------------------------
@@ -282,23 +381,14 @@ POTENTIAL GetPartialExternalPotential(CONFIGURATION Configuration, int reference
             Configuration.Molecules[referenceMolecule].Atoms[referenceParticle].AttractiveExponent, 
             Configuration.Molecules[i].Atoms[j].AttractiveExponent
           );
-          if(ReferencePotential == MIE){
-            potential = GetPotentialMie(
-              RepulsiveExponent,
+          potential = GetNonbondedPotentialPair(
+            RepulsiveExponent,
               AttractiveExponent,
               sigma,
               epsilon,
-              Distance
-            );
-          }else if(ReferencePotential == BARKER_HENDERSON_REFERENCE){
-            potential = GetBHPotentialReference(
-              RepulsiveExponent,
-              AttractiveExponent,
-              sigma,
-              epsilon,
-              Distance
-            );
-          }
+              Distance,
+              ReferencePotential
+          );
           if(Beta*potential > 10){
             PartialPotential.overlap = true;
             PartialPotential.potential = 1E6;
@@ -470,31 +560,14 @@ double GetPotentialNonbonded(CONFIGURATION Configuration, enum PotentialType Pot
               Configuration.Molecules[i].Atoms[j].AttractiveExponent, 
               Configuration.Molecules[k].Atoms[l].AttractiveExponent
             );
-            if(Potential == BARKER_HENDERSON_REFERENCE){
-              Sum += GetBHPotentialReference(
-                RepulsiveExponent,
-                AttractiveExponent,
-                sigma,
-                epsilon,
-                Distance
-              );
-            }else if(Potential == BARKER_HENDERSON_PERTURBED){
-              Sum += GetBHPotentialPerturbed(
-                RepulsiveExponent,
-                AttractiveExponent,
-                sigma,
-                epsilon,
-                Distance
-              );
-            }else if(Potential == MIE){
-              Sum += GetPotentialMie(
-                RepulsiveExponent,
-                AttractiveExponent,
-                sigma,
-                epsilon,
-                Distance
-              );
-            }
+            Sum += GetNonbondedPotentialPair(
+              RepulsiveExponent,
+              AttractiveExponent,
+              sigma,
+              epsilon,
+              Distance,
+              Potential
+            );
           }
         }
       }

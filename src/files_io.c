@@ -39,6 +39,29 @@ char* GetEnsembleLabel(enum ensemble InputEnsemble){
  * Parameters | Potential: An enumeration value representing a potential type (MIE or HARD_SPHERE).                           
  * **************************************************************************************************************/
 char* GetPotentialTypeLabel(enum PotentialType Potential){
+  switch (Potential){
+    case MIE:
+      return "Mie";
+    
+    case HARD_SPHERE:
+      return "Hard-sphere";
+    
+    case BARKER_HENDERSON_REFERENCE:
+      return "Barker-Henderson referece";
+    
+    case BARKER_HENDERSON_PERTURBED:
+      return "Barker-Henderson perturbed";
+    
+    case WEEKS_CHANDLER_ANDERSEN_REFERENCE:
+      return "Weeks-Chandler-Andersen reference";
+
+    case WEEKS_CHANDLER_ANDERSEN_PERTURBED:
+      return "Weeks-Chandler-Andersen perturbed";
+
+    default:
+      return "Invalid potential";
+  }
+
   if(Potential==MIE){
    return "Mie";
   }else if(Potential==HARD_SPHERE){
@@ -164,6 +187,11 @@ void ReadInputFile(char inputsFilePath[]){
       || strcmp(InputData, "BARKER_HENDERSON")==0
     ){
      ReferencePotential = BARKER_HENDERSON_REFERENCE;
+    }else if(
+      strcmp(InputData, "WEEKS_CHANDLER_ANDERSEN_REFERENCE")==0
+      || strcmp(InputData, "WEEKS_CHANDER_ANDERSER")==0
+    ){
+      ReferencePotential = WEEKS_CHANDLER_ANDERSEN_REFERENCE;
     }else{
      printf("Reference potential not recognized\n");
     }
@@ -178,6 +206,11 @@ void ReadInputFile(char inputsFilePath[]){
       || strcmp(InputData, "BARKER_HENDERSON")==0
     ){
      PerturbationPotential = BARKER_HENDERSON_PERTURBED;
+    }else if(
+      strcmp(InputData, "WEEKS_CHANDLER_ANDERSEN_PERTURBED")==0
+      || strcmp(InputData, "WEEKS_CHANDER_ANDERSER")==0
+    ){
+      ReferencePotential = WEEKS_CHANDLER_ANDERSEN_PERTURBED;
     }else{
       printf("Pertubed potential not recognized\n");
     }
