@@ -189,7 +189,7 @@ void ReadInputFile(char inputsFilePath[]){
      ReferencePotential = BARKER_HENDERSON_REFERENCE;
     }else if(
       strcmp(InputData, "WEEKS_CHANDLER_ANDERSEN_REFERENCE")==0
-      || strcmp(InputData, "WEEKS_CHANDER_ANDERSER")==0
+      || strcmp(InputData, "WEEKS_CHANDLER_ANDERSEN")==0
     ){
       ReferencePotential = WEEKS_CHANDLER_ANDERSEN_REFERENCE;
     }else{
@@ -208,7 +208,7 @@ void ReadInputFile(char inputsFilePath[]){
      PerturbationPotential = BARKER_HENDERSON_PERTURBED;
     }else if(
       strcmp(InputData, "WEEKS_CHANDLER_ANDERSEN_PERTURBED")==0
-      || strcmp(InputData, "WEEKS_CHANDER_ANDERSER")==0
+      || strcmp(InputData, "WEEKS_CHANDLER_ANDERSEN")==0
     ){
       ReferencePotential = WEEKS_CHANDLER_ANDERSEN_PERTURBED;
     }else{
