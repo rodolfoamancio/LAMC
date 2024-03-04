@@ -82,7 +82,9 @@ double GetBHPotentialPerturbed(
   double Sigma, 
   double Epsilon, 
   double Distance){
-    if(Distance > Sigma){
+    if(Distance <= Sigma){
+      return 0;
+    }else{
       return GetPotentialMie(
         RepulsiveExponent,
         AttractiveExponent,
@@ -90,8 +92,6 @@ double GetBHPotentialPerturbed(
         Epsilon,
         Distance
       );
-    }else{
-      return 0;
     }
 }
 
@@ -102,13 +102,14 @@ double GetWCAPotentialReference(
   double Epsilon, 
   double Distance){
     if(Distance < pow(2, 1.0/6.0)*Sigma){
-      return GetPotentialMie(
+      double potential = GetPotentialMie(
         RepulsiveExponent,
         AttractiveExponent,
         Sigma,
         Epsilon,
         Distance
-      ) + Epsilon;
+      );
+      return potential + Epsilon;
     }else{
       return 0;
     }
@@ -120,16 +121,18 @@ double GetWCAPotentialPerturbed(
   double Sigma, 
   double Epsilon, 
   double Distance){
-    if(Distance >= pow(2, 1.0/6.0)*Sigma){
-      return GetPotentialMie(
+    double potential = 0.0;
+    if(Distance < pow(2, 1.0/6.0)*Sigma){
+      return (-1.0)*Epsilon;
+    }else{
+      double potential = GetPotentialMie(
         RepulsiveExponent,
         AttractiveExponent,
         Sigma,
         Epsilon,
         Distance
       );
-    }else{
-      return -Epsilon;
+      return potential;
     }
 }
 
@@ -608,7 +611,7 @@ double GetPotentialLongRangeCorrection(CONFIGURATION Configuration, enum Potenti
   double PotentialLongRangeCorrection = 0.0;
   enum CarbonType TypeA, TypeB;
 
-  if ((Potential == MIE || Potential == BARKER_HENDERSON_PERTURBED) && !SimulationBox.ClosedBox) {
+  if ((Potential == MIE || Potential == BARKER_HENDERSON_PERTURBED || Potential == WEEKS_CHANDLER_ANDERSEN_PERTURBED) && !SimulationBox.ClosedBox) {
     int NumberPesudoAtoms[NUMBER_PSEUDO_ATOMS_TYPES] = {0, 0, 0, 0};
     // double VolumeCubicMeters = SimulationBox.volume / Cube(METER_TO_ANGSTRON);
     double AuxInteractions = 0;
