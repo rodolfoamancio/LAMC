@@ -61,16 +61,6 @@ char* GetPotentialTypeLabel(enum PotentialType Potential){
     default:
       return "Invalid potential";
   }
-
-  if(Potential==MIE){
-   return "Mie";
-  }else if(Potential==HARD_SPHERE){
-   return "Hard-sphere";
-  }else if(Potential==BARKER_HENDERSON_REFERENCE){
-   return "Barker-Henderson reference";
-  }else if(Potential==BARKER_HENDERSON_PERTURBED){
-   return "Barker-Henderson perturbed";
-  }
 }
 
 /* ***************************************************************************************************************
@@ -210,7 +200,7 @@ void ReadInputFile(char inputsFilePath[]){
       strcmp(InputData, "WEEKS_CHANDLER_ANDERSEN_PERTURBED")==0
       || strcmp(InputData, "WEEKS_CHANDLER_ANDERSEN")==0
     ){
-      ReferencePotential = WEEKS_CHANDLER_ANDERSEN_PERTURBED;
+      PerturbationPotential = WEEKS_CHANDLER_ANDERSEN_PERTURBED;
     }else{
       printf("Pertubed potential not recognized\n");
     }
