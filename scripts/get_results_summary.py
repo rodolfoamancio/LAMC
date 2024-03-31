@@ -1,19 +1,17 @@
-from hashlib import new
-from math import prod
-from types import new_class
 import pandas as pd
 import numpy as np
 import glob
 import argparse
 from multiprocessing import Pool
 from sklearn.linear_model import LinearRegression
+from typing import Tuple
 
 def argparser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--cpus', type=int, required=False, default=1)
+    parser.add_argument("--cpus", type=int, required=False, default=1)
     return parser.parse_args()
 
-def get_block_std(series, number_blocks):
+def get_block_std(series: pd.Series, number_blocks: int) -> float:
     total_size = len(series)
     block_size = int(total_size / number_blocks)
     block_means = []
@@ -27,11 +25,10 @@ def get_block_std(series, number_blocks):
     
     return std_dev
 
-def get_statistical_inefficiency_curve(series):
+def get_statistical_inefficiency_curve(series: pd.Series) -> Tuple[np.array]:
     total_size = len(series)
     std_total = series.std()
-    n_blocks_array = np.linspace(2, int(total_size/10), 50, dtype=int)
-    std_list = []
+    n_blocks_array = np.linspace(2, int(total_size/10), 10, dtype=int)
     stat_ineff_list = []
     inverse_block_size_list = []
     for n_blocks in n_blocks_array:
@@ -39,11 +36,10 @@ def get_statistical_inefficiency_curve(series):
         std = get_block_std(series, n_blocks)
         stat_ineff = block_size*(std**2)/(std_total**2)
         inverse_block_size_list.append(n_blocks/total_size)
-        std_list.append(std)
         stat_ineff_list.append(stat_ineff)
     return np.array(inverse_block_size_list).reshape(-1,1), np.array(stat_ineff_list).reshape(-1,1)
 
-def get_series_statistics(series):
+def get_series_statistics(series: pd.Series) -> pd.DataFrame:
     if series.nunique() > 2:
         x, y = get_statistical_inefficiency_curve(series)
         regression = LinearRegression().fit(x, y)
@@ -53,7 +49,7 @@ def get_series_statistics(series):
         std_corrected = np.sqrt((std_global**2) * estimated_statistical_inefficiency / total_steps)
     else:
         std_corrected = 0
-        estimated_statistical_inefficiency = 'NA'
+        estimated_statistical_inefficiency = "NA"
     
     mean = series.mean()
 
@@ -71,30 +67,31 @@ def get_series_statistics(series):
 def get_summary(production_data):
     
     properties = [
-        'temperature',
-        'volume',
-        'number_molecules', 
-        'density_number', 
-        'density_mass', 
-        'density_mol', 
-        'potential_total', 
-        'potential_bonded', 
-        'potential_nonbonded', 
-        'potential_lrc', 
-        'potential_walls', 
-        'potential_perturbed',
-        'weight_ghost_molecule', 
-        'pressure_total', 
-        'pressure_excess', 
-        'pressure_ideal', 
-        'pressure_lrc', 
-        'weight_ideal_chain',
-        'x_size',
-        'y_size', 
-        'z_size'
+        "temperature",
+        "volume",
+        "number_molecules", 
+        "density_number", 
+        "density_mass", 
+        "density_mol", 
+        "potential_total", 
+        "potential_bonded", 
+        "potential_nonbonded", 
+        "potential_lrc", 
+        "potential_walls", 
+        "potential_perturbed",
+        "potential_perturbed_squared",
+        "weight_ghost_molecule", 
+        "pressure_total", 
+        "pressure_excess", 
+        "pressure_ideal", 
+        "pressure_lrc", 
+        "weight_ideal_chain",
+        "x_size",
+        "y_size", 
+        "z_size"
     ]
     
-    production_data = production_data.apply(pd.to_numeric, errors='coerce')
+    production_data = production_data.apply(pd.to_numeric, errors="coerce")
     dfs = []
     for column in properties:
         if column in production_data.columns:
@@ -104,91 +101,99 @@ def get_summary(production_data):
 
     return summary_df
 
+def get_potential_perturbed_covariance(series: pd.Series) -> float:
+    series_squared = series**2
+    global_cov = series.cov(series_squared)
+    num_points = len(series)
+    n_blocks_array = np.linspace(2, int(num_points/10), 10, dtype=int)
+    stat_ineff_list = []
+    inverse_block_size_list = []
+    for n_blocks in n_blocks_array:
+        block_size = int(num_points/n_blocks)
+        list_a = []
+        list_b = []
+        for i in range(n_blocks):
+            list_a.append(series[i*block_size:(i+1)*block_size].mean())
+            list_b.append(series_squared[i*block_size:(i+1)*block_size].mean())
+        cov = pd.Series(list_a).cov(pd.Series(list_b))
+        stat_ineff = block_size*(cov**2)/(global_cov**2)
+        inverse_block_size_list.append(n_blocks/num_points)
+        stat_ineff_list.append(stat_ineff)
+
+    x = np.array(inverse_block_size_list).reshape(-1, 1)
+    y = np.array(stat_ineff_list).reshape(-1, 1)
+
+    model = LinearRegression().fit(x, y)
+
+    final_statistical_inefficienty = model.intercept_[0]
+
+    cov_corrected = final_statistical_inefficienty*global_cov/num_points
+    return cov_corrected
+
 def get_properties_summary(filename):
-    try:
-        system_name = filename.split('properties')[0]
+    system_name = filename.split("properties")[0]
 
-        raw_data = pd.read_csv(filename, sep='\s+')
-        production_data = raw_data.loc[int(raw_data.shape[0]/2):].reset_index(drop=True)
-        
+    raw_data = pd.read_csv(filename, sep="\s+")
+    production_data = (
+        raw_data
+        .apply(pd.to_numeric, errors="coerce")
+        .query("production == 1")
+        .reset_index(drop=True)
+    )
 
-        object_columns = production_data.select_dtypes(include=['object']).columns
-        production_data[object_columns] = production_data[object_columns].apply(pd.to_numeric, errors='coerce')
+    production_data["potential_perturbed_squared"] = (
+        production_data
+        .potential_perturbed
+        .map(lambda x: x**2)
+    )
 
-        
-        results_summary = get_summary(production_data).set_index('Property')
+    results_summary = get_summary(production_data).set_index("Property")
 
-        if 'weight_ghost_molecule' in production_data.columns:
-            mean_weight_ghost_molecule = results_summary.loc['weight_ghost_molecule', 'Mean']
-            std_weight_ghost_molecule = results_summary.loc['weight_ghost_molecule', 'STD']
-            mean_weight_ideal_chain = production_data['weight_ideal_chain'].mean()
-            std_weight_ideal_chain = production_data['std_weight_ideal_chain'].mean()
-            pressure_ideal_gas = results_summary.loc['pressure_ideal', 'Mean']
+    beta = 1/(BOLTZMANN_CONSTANT*results_summary.loc["temperature", "Mean"])
+    n = results_summary.loc["number_molecules", "Mean"]
+    a1 = 0
+    a2 = 0
+    a1_std = 0
+    a2_std = 0
 
-            std_fugacity = np.sqrt(
-                (pressure_ideal_gas**2) *
-                ((std_weight_ideal_chain**2) / (mean_weight_ghost_molecule**2) +
-                 (mean_weight_ideal_chain**2) * (std_weight_ghost_molecule**2) / (mean_weight_ghost_molecule**4))
-            )
-            fugacity = pressure_ideal_gas * mean_weight_ideal_chain / mean_weight_ghost_molecule
-            mean_pressure = results_summary.loc['pressure_total', 'Mean']
-            std_pressure = results_summary.loc['pressure_total', 'STD']
-            std_phi = np.sqrt(
-                (std_fugacity**2) / (mean_pressure**2) +
-                (fugacity**2) * (std_pressure**2) / (mean_pressure**4)
-            )
-            phi = fugacity / results_summary.loc['pressure_total', 'Mean']
+    mean_u1 = results_summary.loc["potential_perturbed", "Mean"]
+    mean_u1_sqr = results_summary.loc["potential_perturbed_squared", "Mean"]
+    std_u1 = results_summary.loc["potential_perturbed", "STD"]
+    std_u1_sqr = results_summary.loc["potential_perturbed_squared", "STD"]
+    cov_u1_u1_sqr = get_potential_perturbed_covariance(production_data.potential_perturbed)
 
-            fugacity_results = {
-                'phi': {'Mean': phi, 'STD': std_phi, 'Statistical inefficiency': 'NA'},
-                'fugacity': {'Mean': fugacity, 'STD': std_fugacity, 'Statistical inefficiency': 'NA'}
-            }
-            results_summary = pd.concat([results_summary, pd.DataFrame.from_dict(fugacity_results, orient='index')])
+    a1 = (beta/n)*mean_u1
+    a2 = -0.5*((beta**2)/n)*(mean_u1_sqr - (mean_u1**2))
 
-        beta = 0
-        a1 = 0
-        a2 = 0
+    a1_std = (beta/n)*std_u1
+    a2_std = 0.5*((beta**2)/n)*np.sqrt(
+        (std_u1_sqr**2) 
+        + (4*(mean_u1**2)*(std_u1**2))
+        - (2*mean_u1*cov_u1_u1_sqr)
+    )
 
-        try:
-            beta = 1 / (BOLTZMANN_CONSTANT * production_data["temperature"].mean())
-            pert_mean = production_data.potential_perturbed.mean()
-            pert_var = production_data.potential_perturbed.var(ddof=0)
-            n = production_data.number_molecules.mean()
+    perturbation_results = {
+        "a1": {"Mean": a1, "STD": a1_std, "Statistical inefficiency": "NA"},
+        "a2": {"Mean": a2, "STD": a2_std, "Statistical inefficiency": "NA"}
+    }
 
-            a1 = (beta/n)*pert_mean
-            a2 = (-0.5*(beta**2)/n)*pert_var
-        except:
-            pass
+    displacement_acceptance = production_data["displacement_acceptance"].iloc[-1]
 
-        perturbation_results = {
-            'a1': {'Mean': a1, 'STD': 0, 'Statistical inefficiency': 'NA'},
-            'a2': {'Mean': a2, 'STD': 0, 'Statistical inefficiency': 'NA'}
-        }
+    displacement_results = {
+        "displacement_acceptance": {"Mean": displacement_acceptance, "STD": 0, "Statistical inefficiency": "NA"}
+    }
 
-        displacement_acceptance = 0
-        try:
-            displacement_acceptance = production_data["displacement_acceptance"].iloc[-1]
-        except:
-            pass
-            
-        displacement_results = {
-            'displacement_acceptance': {'Mean': displacement_acceptance, 'STD': 0, 'Statistical inefficiency': 'NA'}
-        }
+    results_concat = pd.concat([
+        results_summary,
+        pd.DataFrame.from_dict(perturbation_results, orient="index"),
+        pd.DataFrame.from_dict(displacement_results, orient="index")
+    ])
 
-        results_concat = pd.concat([
-            results_summary,
-            pd.DataFrame.from_dict(perturbation_results, orient='index'),
-            pd.DataFrame.from_dict(displacement_results, orient='index')
-        ])
-
-        results_concat.to_csv(system_name+'summary.csv')
-
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
+    results_concat.to_csv(system_name+"summary.csv")
 
 if __name__ == "__main__":
     BOLTZMANN_CONSTANT = 1.38064852E-23
     CPUS = int(argparser().cpus)
-    filename_list = glob.glob('*properties*')
+    filename_list = glob.glob("*properties*")
     with Pool(processes=CPUS) as pool:
         pool.map(get_properties_summary, filename_list)
