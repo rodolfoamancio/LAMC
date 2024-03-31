@@ -71,7 +71,7 @@ def main():
     new_df = pd.concat(dfs, ignore_index=True)
     # Concatenates all the processed dataframes into a single dataframe
     
-    new_df.to_csv(output_name)
+    new_df.to_csv(output_name, index=False)
     # Saves the dataframe as a CSV file with the specified output name
 
 
