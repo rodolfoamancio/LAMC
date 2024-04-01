@@ -244,7 +244,7 @@ double RunSimulation(char* InputFileName){
     DisplacementAcceptanceCalculated = (double) DisplacementStepsAccepted/DisplacementStepsAttempted;
     if(i%OptimizeAcceptanceEverySteps==0 && i<NumberEquilibrationSteps){
       MaxTranslationDistance *= LimMinMax(DisplacementAcceptanceCalculated/DisplacementAcceptanceTarget, 0.1, 1.9);
-      MaxTranslationDistance = LimMinMax(MaxTranslationDistance, 0.01, 20.0);
+      MaxTranslationDistance = LimMinMax(MaxTranslationDistance, 0.01, 40.0);
     }
 
     // adjust maximum volume change according to the acceptance ratio
