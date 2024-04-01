@@ -168,8 +168,8 @@ def get_properties_summary(filename):
     a1_std = (beta/n)*std_u1
     a2_std = 0.5*((beta**2)/n)*np.sqrt(
         (std_u1_sqr**2) 
-        + (4*(mean_u1**2)*(std_u1**2))
-        - (2*mean_u1*cov_u1_u1_sqr)
+        + 4*((mean_u1**2)*(std_u1**2))
+        - 4*(mean_u1*cov_u1_u1_sqr)
     )
 
     perturbation_results = {
