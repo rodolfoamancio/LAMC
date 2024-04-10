@@ -57,90 +57,6 @@ def make_bin_centers(box_height: float, number_of_bins: int) -> np.ndarray:
     
     return bin_centers
 
-def get_number_molecules_profile_results(results_list: List[pd.DataFrame], bin_centers: np.ndarray) -> pd.DataFrame:
-    """
-    Calculate the number of molecules for each bin in the given results list.
-
-    Args:
-        results_list (list): A list of pandas DataFrames containing the results.
-        bin_centers (array-like): An array or list of bin centers.
-
-    Returns:
-        pandas.DataFrame: The number of molecules for each bin.
-    """
-
-    df_number_molecules = (
-        pd.concat(
-            [result[["number_molecules"]].rename(columns={"number_molecules":i}) for i, result in enumerate(results_list)],
-            axis=1
-        )
-        .fillna(0)
-        .T
-    )
-
-    return df_number_molecules
-
-
-def get_orietantion_profile_results(results_list: List[pd.DataFrame], bin_centers: np.ndarray) -> pd.DataFrame:
-    """
-    Calculate the orientation profile results.
-
-    Parameters:
-    - results_list: A list of dataframes containing the results.
-    - bin_centers: An array or list of bin centers.
-
-    Returns:
-    - The transposed orientation profile dataframe.
-    """
-
-    df_orientation = (
-        pd.concat(
-            [result[["S"]].rename(columns={"S":i}) for i, result in enumerate(results_list)],
-            axis=1
-        )
-        .fillna(0)
-        .T
-    )
-    
-    return df_orientation
-
-def get_profile_summary(profiles):
-    """
-    Calculates the mean, standard deviation, and number of unique values for a given dataframe of profiles.
-
-    Parameters:
-    - profiles (pandas.DataFrame): A dataframe containing profiles data
-
-    Returns:
-    - statistics (pandas.DataFrame): A dataframe with columns 'index', 'mean', 'std', and 'nunique'
-                                     representing the statistical summary of the profiles data
-    """
-    midpoint = profiles.shape[0] // 2
-    profiles_production = profiles.iloc[midpoint:]
-    
-    statistics = (
-        profiles_production
-        .agg(['mean', 'std', 'nunique'])
-        .T
-        .reset_index(names="Bin")
-    )
-
-    statistics_mirror = (
-        statistics
-        .copy()
-        .assign(
-            Bin = lambda df: (
-                -1*df["Bin"]
-            )
-        )
-    )
-
-    statistics_final = (
-        pd.concat([statistics, statistics_mirror], ignore_index=True)
-        .sort_values("Bin")
-    )
-    
-    return statistics_final
 
 def get_profiles(filename: str) -> None:
     """
@@ -170,87 +86,108 @@ def get_profiles(filename: str) -> None:
                 splited_line = line.split()
 
                 if line_number == 0:
+                    # inicialização
                     if len(splited_line) == 4:
                         box_x_size, box_y_size, box_z_size, molar_mass = map(float, splited_line)
                     else:    
                         box_x_size, box_y_size, box_z_size, _, molar_mass = map(float, splited_line)
                     bin_centers = make_bin_centers(box_z_size, NUMBER_BINS)
                     bin_size = box_z_size / NUMBER_BINS
-                    bin_volume = bin_size * box_x_size * box_y_size * 1.0E-30
-
-                if len(splited_line) >= 4 :
-                    if len(aux_df) > 0:
-                        results_inter = (
-                            aux_df
-                            .apply(lambda x: x.astype(float))
-                            .assign(
-                                bin = lambda df: (
-                                    df["z"]
-                                    .apply(lambda z: get_bin(z, bin_centers))
-                                )
-                            )
-                        )
-                        
-                        results = (
-                            results_inter
-                            .groupby("bin", as_index=False)
-                            .agg(
-                                S = ("S", "mean"),
-                                number_molecules = ("z", "count")
-                            )
-                            .merge(
-                                pd.DataFrame({"bin":bin_centers}),
-                                on="bin",
-                                how="right"
-                            )
-                            .fillna(0)
-                            .assign(
-                                abs_bin = lambda df: (
-                                    np.abs(df["bin"])
-                                )
-                            )
-                            .groupby("abs_bin")
-                            .agg(
-                                S = ("S", "mean"),
-                                number_molecules = ("number_molecules", "mean")
-                            )
-                        )
-                        
-                        results_list.append(results.copy())
-                        aux_df = pd.DataFrame(columns=['z', 'S'])
-                        index_counter = 0
+                    bin_volume = bin_size * box_x_size * box_y_size
                 elif len(splited_line) == 2:
+                    # adição novo dado
                     aux_df.loc[index_counter] = splited_line
                     index_counter += 1
+                elif len(splited_line) == 0:
+                    # consolidação de resultados
+                    results_inter = (
+                        aux_df
+                        .apply(lambda x: x.astype(float))
+                        .assign(
+                            bin = lambda d: d.z.apply(lambda x: get_bin(x, bin_centers))
+                        )
+                        .groupby("bin", as_index=False)
+                        .agg(
+                            s = ("S", "mean"),
+                            n = ("z", "count")
+                        )
+                        .merge(
+                            pd.DataFrame({"bin":bin_centers}),
+                            on="bin",
+                            how="right"
+                        )
+                        .fillna(0)
+                        .assign(
+                            abs_bin = lambda d: np.round(d.bin.abs(), 4)
+                        )
+                        .groupby("abs_bin", as_index=False)
+                        .agg(
+                            s = ("s", "mean"),
+                            n = ("n", "mean")
+                        )
+                    )
+
+                    results_list.append(results_inter.copy())
+                    aux_df = pd.DataFrame(columns=['z', 'S'])
+                    index_counter = 0
+                    
         
-        number_molecules_profiles = get_number_molecules_profile_results(results_list, bin_centers)
-        orietantion_profiles = get_orietantion_profile_results(results_list, bin_centers)
+        production_list = results_list[int(len(results_list)*0.75):]
 
-        number_molecules_summary = (
-            get_profile_summary(number_molecules_profiles)
-            # .merge(
-            #     pd.DataFrame({"Bin":bin_centers}),
-            #     on="Bin",
-            #     how="right"
-            # )
-            # .fillna(0)
+        N = 5
+        size = len(production_list)//N
+
+        chunks = [pd.concat(production_list[size*i:size*(i+1) if i < N - 1 else None]) for i in range(N)]
+
+        chunks_avg = [
+            (
+                chunk
+                .groupby("abs_bin", as_index=False)
+                .agg(
+                    s=("s", "mean"),
+                    n=("s", "mean")
+                )
+            )
+            for chunk in chunks
+        ]
+
+        df_summary = (
+            pd.concat(chunks_avg, ignore_index=True)
+            .groupby("abs_bin", as_index=False)
+            .agg(
+                s_avg = ("s", "mean"),
+                s_std = ("s", "std"),
+                n_avg = ("n", "mean"),
+                n_std = ("n", "std")
+            )
         )
 
-        molar_density_summary = number_molecules_summary.copy()
-        molar_density_summary['mean'] /= bin_volume * AVOGADRO_NUMBER
-
-        mass_density_summary = molar_density_summary.copy()
-        mass_density_summary['mean'] *= molar_mass / 1000
-
-        orietantion_summary = (
-            get_profile_summary(orietantion_profiles)
-            # .merge(
-            #     pd.DataFrame({"Bin":bin_centers}),
-            #     on="Bin",
-            #     how="right"
-            # )
-            # .fillna(0)
+        df_mirror = (
+            df_summary
+            .query("abs_bin != 0")
+            .assign(abs_bin = lambda d: -1*d.abs_bin)
         )
+
+        df_complete = (
+            pd.concat([df_summary, df_mirror], ignore_index=True)
+            .rename(columns={"abs_bin":"bin"})
+            .assign(
+                # molecules/A³
+                d_n_avg = lambda d: d.n_avg/bin_volume,
+                d_n_std = lambda d: d.n_std/bin_volume,
+                # mol/m³
+                d_mol_avg = lambda d: d.d_n_avg*1E30/AVOGADRO_NUMBER,
+                d_mol_std = lambda d: d.d_n_std*1E30/AVOGADRO_NUMBER,
+                # kg/m³
+                d_mass_avg = lambda d: d.d_mol_avg*molar_mass/1000,
+                d_mass_std = lambda d: d.d_mol_std*molar_mass/1000,
+            )
+        )
+
+        number_molecules_summary = df_complete[["bin", "d_n_avg", "d_n_std"]].rename(columns={"d_n_avg":"mean", "d_n_std":"std"})
+        molar_density_summary = df_complete[["bin", "d_mol_avg", "d_mol_std"]].rename(columns={"d_mol_avg":"mean", "d_mol_std":"std"})
+        mass_density_summary = df_complete[["bin", "d_mass_avg", "d_mass_std"]].rename(columns={"d_mass_avg":"mean", "d_mass_std":"std"})
+        orietantion_summary = df_complete[["bin", "s_avg", "s_std"]].rename(columns={"s_avg":"mean", "s_std":"std"})
 
         number_molecules_summary.to_csv(base_name + 'number_molecules_profile.csv', index=False)
         molar_density_summary.to_csv(base_name + 'molar_density_profile.csv', index=False)
