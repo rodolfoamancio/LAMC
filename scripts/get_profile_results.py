@@ -145,7 +145,7 @@ def get_profiles(filename: str) -> None:
                 .groupby("abs_bin", as_index=False)
                 .agg(
                     s=("s", "mean"),
-                    n=("s", "mean")
+                    n=("n", "mean")
                 )
             )
             for chunk in chunks
@@ -184,10 +184,10 @@ def get_profiles(filename: str) -> None:
             )
         )
 
-        number_molecules_summary = df_complete[["bin", "d_n_avg", "d_n_std"]].rename(columns={"d_n_avg":"mean", "d_n_std":"std"})
-        molar_density_summary = df_complete[["bin", "d_mol_avg", "d_mol_std"]].rename(columns={"d_mol_avg":"mean", "d_mol_std":"std"})
-        mass_density_summary = df_complete[["bin", "d_mass_avg", "d_mass_std"]].rename(columns={"d_mass_avg":"mean", "d_mass_std":"std"})
-        orietantion_summary = df_complete[["bin", "s_avg", "s_std"]].rename(columns={"s_avg":"mean", "s_std":"std"})
+        number_molecules_summary = df_complete[["bin", "d_n_avg", "d_n_std"]].rename(columns={"d_n_avg":"avg", "d_n_std":"std"})
+        molar_density_summary = df_complete[["bin", "d_mol_avg", "d_mol_std"]].rename(columns={"d_mol_avg":"avg", "d_mol_std":"std"})
+        mass_density_summary = df_complete[["bin", "d_mass_avg", "d_mass_std"]].rename(columns={"d_mass_avg":"avg", "d_mass_std":"std"})
+        orietantion_summary = df_complete[["bin", "s_avg", "s_std"]].rename(columns={"s_avg":"avg", "s_std":"std"})
 
         number_molecules_summary.to_csv(base_name + 'number_molecules_profile.csv', index=False)
         molar_density_summary.to_csv(base_name + 'molar_density_profile.csv', index=False)
