@@ -132,7 +132,7 @@ def get_profiles(filename: str) -> None:
                     index_counter = 0
                     
         
-        production_list = results_list[int(len(results_list)*0.75):]
+        production_list = results_list[int(len(results_list)*0.5):]
 
         N = 5
         size = len(production_list)//N
