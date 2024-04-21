@@ -15,7 +15,7 @@ The program implemented here utilizes Configurational Bias Monte Carlo for simul
 This code is divided into folders:
 1. `src`: source code files, main components for running the program, implementation of Monte Carlo algorithms as well as properties calculations and input/output routines;
 2. `scripts`: `python` files used for post-processing data, running multiple simulations on parallel and other routines;
-3. `data`: files used for simulating the data presented on the dissertation;
+3. `data`: results used in the dissertation;
 4. `notebooks`: additional `jupyter-notebook` files used for analyzing, post-processing the data and creating input files.
 
 ## Code compilation and utilization
