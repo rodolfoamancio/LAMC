@@ -1,7 +1,6 @@
 *.o
 *.exe
 *.out*
-*.csv
 *.inp
 *.pbs
 data/andre.tar.xz
