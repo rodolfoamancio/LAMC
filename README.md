@@ -9,7 +9,7 @@ This repository centralizes the code implemented for research during my Master's
 
 ## Objective
 
-The program implemented here utilizes Configurational Bias Monte Carlo for simulating linear alkanes in different ensembles: NVT, NPT and $\mu$VT. Confinement evaluated using an implicit potential (Steele 10-4-3) and perturbation terms can be calculated. Simulation potentials are: Hard-sphere and Mie.
+The program implemented here utilizes Configurational Bias Monte Carlo for simulating linear alkanes in different ensembles: $NVT$, $NPT$ and $\mu VT$. Confinement evaluated using an implicit potential (Steele 10-4-3) and perturbation terms can be calculated. Simulation potentials are: Hard-sphere and Mie.
 
 ## Structure
 This code is divided into folders:
